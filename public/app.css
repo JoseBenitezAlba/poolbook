@@ -1,0 +1,317 @@
+/* Estilos generales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #faf8f7;
+  height: 100vh;
+  width: 100vw;
+  font-family: "Work Sans", sans-serif;
+}
+
+/* Pagina Home */
+.bienvenidos {
+  color: #8dc8f0;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 80px;
+
+}
+
+h2 {
+  font-size: 10vmin;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.border {
+  color: #8dc8f0;
+  text-shadow: -1px -1px 0 #FEEE7A, 1px -1px 0 #FEEE7A, -1px 1px 0 #FEEE7A, 1px 1px 0 #FEEE7A;
+}
+
+/* Animacion de una Ola */
+.ola {
+  color: white;
+  animation: shift 5s ease-in-out infinite;
+}
+
+/* Botones */
+.btn-liquid {
+  display: inline-block;
+  position: relative;
+  width: 450px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  color: #fff;
+  font-weight: bold;
+  font: 700 16px/60px "Droid Sans", sans-serif;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.btn-liquid .inner {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-liquid canvas {
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  bottom: -50px;
+  left: -50px;
+  z-index: 1;
+}
+
+/* Movimiento de los botones */
+@keyframes shift {
+  0%, 100% {
+      clip-path: polygon(0% 47%, 10% 48%, 33% 54%, 54% 60%, 70% 61%, 84% 59%, 100% 52%, 100% 100%, 0% 100%);
+  }
+  50% {
+      clip-path: polygon(0% 60%, 15% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%);
+  }
+}
+
+.container {
+  height: 100%;
+  width: 100%;
+  background: #0f4c75;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  font-family: Arial;
+  text-align: center;
+  font-size: 2em;
+  color: rgba(255, 255, 255, .8);
+}
+
+/* Olas en movimiento abajo */
+.waves {
+  position: absolute;
+  bottom: -135px;
+  height: 527px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.wave {
+  position: absolute;
+  left: -180px;
+  bottom: 0;
+  width: 2402px;
+  height: 427px;
+  background: url(https://static.platzi.com/media/files/waves_c8551f5d-ecf6-4a81-ae1d-f3a0ad55ba10.png) center bottom no-repeat;
+  animation: 5s wave ease-in-out infinite alternate;
+}
+
+.wave.a {
+  background-position: 0 -854px;
+}
+
+.wave.b {
+  background-position: 0 -427px;
+  animation-delay: .6s;
+}
+
+.wave.c {
+  background-position: 0 0;
+  animation-delay: 1.2s;
+}
+
+@keyframes wave {
+  0% {
+      transform: translate(0 , 0);
+  }
+  50% {
+      transform: translate(-80px, 30px);
+  }
+  100% {
+      transform: translate(160px, -60px);
+  }
+}
+
+/* Login */
+
+/* public/css/app.css o resources/css/app.css */
+
+/* app.css */
+
+/* General body styles */
+body {
+  font-family: 'Overpass', sans-serif;
+  font-weight: normal;
+  font-size: 100%;
+  color: #1b262c;
+  margin: 0;
+  background-color: #0f4c75;
+}
+
+/* Navbar styles */
+.navbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .navbar-brand {
+  font-weight: bold;
+  color: #3490dc;
+}
+
+.navbar .nav-link {
+  color: #3490dc;
+  margin-right: 10px;
+}
+
+.navbar .nav-link:hover {
+  color: #1d72b8;
+}
+
+.navbar .dropdown-menu {
+  right: 0;
+  left: auto;
+  border-radius: 0.25rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+}
+
+.navbar-toggler {
+  border-color: #3490dc;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%2886, 61, 124, 0.7%29' stroke-width='2' linecap='round' linejoin='round' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Form styling */
+#contenedor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  width: 100%;
+  height: 100%;
+}
+
+#central {
+  max-width: 320px;
+  width: 100%;
+}
+
+.titulo {
+  font-size: 250%;
+  color: #bbe1fa;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#login {
+  width: 100%;
+  padding: 50px 30px;
+  background-color: #3282b8;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+#login input {
+  font-family: 'Overpass', sans-serif;
+  font-size: 110%;
+  color: #1b262c;
+  display: block;
+  width: 100%;
+  height: 40px;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 3px;
+}
+
+#login input::placeholder {
+  color: #e4e4e4;
+}
+
+#login button {
+  font-family: 'Overpass', sans-serif;
+  font-size: 110%;
+  color: #1b262c;
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 3px;
+  background-color: #bbe1fa;
+  margin-top: 10px;
+}
+
+#login button:hover {
+  background-color: #0f4c75;
+  color: #bbe1fa;
+}
+
+.pie-form {
+  font-size: 90%;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.pie-form a {
+  display: block;
+  text-decoration: none;
+  color: #bbe1fa;
+  margin-bottom: 3px;
+}
+
+.pie-form a:hover {
+  color: #0f4c75;
+}
+
+.inferior {
+  margin-top: 10px;
+  font-size: 90%;
+  text-align: center;
+}
+
+.inferior a {
+  display: block;
+  text-decoration: none;
+  color: #bbe1fa;
+  margin-bottom: 3px;
+}
+
+.inferior a:hover {
+  color: #3282b8;
+}
+
+/* Calendario */
+.fc-datagrid-cell-frame {
+  height: 50px;
+}
+
+/* Estilos reserva */
+.reserva {
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 20px 0;
+}
