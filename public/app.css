@@ -4,6 +4,9 @@
   padding: 0;
   box-sizing: border-box;
 }
+html {
+  overflow: hidden;
+}
 
 body {
   background: #faf8f7;
@@ -11,7 +14,6 @@ body {
   width: 100vw;
   font-family: "Work Sans", sans-serif;
 }
-
 /* Pagina Home */
 .bienvenidos {
   color: #8dc8f0;
