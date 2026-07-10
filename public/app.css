@@ -16,7 +16,7 @@ body {
     color:#8dc8f0;
     font-size:36px;
     font-weight:bold;
-top:38%;
+    top:38%;
     position:absolute;     
     margin:0 0 25px 0;
 }
@@ -304,4 +304,37 @@ hr {
   border: none;
   border-top: 1px solid #ccc;
   margin: 20px 0;
+}
+@media (max-width: 768px) {
+    .btn-liquid {
+        width: 85vw;
+        height: 50px;
+        font-size: 14px;
+    }
+
+    .Home-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .bienvenidos {
+        font-size: 24px;
+        margin-bottom: 30px;
+        position: relative;
+        top: auto;
+    }
+
+h2 {
+    font-size: 12vmin;
+    top: 5%;
+}
+.content {
+    justify-content: flex-start;
+    padding-top: 15vh;
+    gap: 10px;
+}   
+
 }
