@@ -1,3 +1,12 @@
+# Fase 1: compilar assets con Node/Vite
+FROM node:20 AS assets
+WORKDIR /app
+COPY package*.json vite.config.js ./
+RUN npm install
+COPY resources ./resources
+RUN npm run build
+
+# Fase 2: aplicación PHP
 FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
@@ -10,6 +19,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 
 COPY . .
+
+# Copiamos los assets ya compilados desde la fase de Node
+COPY --from=assets /app/public/build ./public/build
 
 ENV COMPOSER_NO_SECURITY_BLOCKING=1
 
