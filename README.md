@@ -15,7 +15,7 @@ Aplicación web para **gestionar reservas de carriles en una piscina**, con pane
 🔗 **Demo Online:** https://poolbook-production.up.railway.app  
 🎥 **Video en YouTube:** https://youtu.be/JI9NC-3bdPs
 
-> ⚠️ *Railway es un servidor gratuito: Puede tardar unos segundos en cargar o contener algún error puntual. Para una experiencia completa y estable sigue los pasos de instalación de abajo.*
+> ⚠️ *Render es un servidor gratuito: Puede tardar unos segundos en cargar o contener algún error puntual. Para una experiencia completa y estable sigue los pasos de instalación de abajo.*
 
 ---
 
