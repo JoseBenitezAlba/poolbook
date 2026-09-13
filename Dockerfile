@@ -11,6 +11,8 @@ WORKDIR /app
 
 COPY . .
 
+ENV COMPOSER_NO_SECURITY_BLOCKING=1
+
 RUN composer update --no-dev --optimize-autoloader --no-interaction
 
 RUN mkdir -p storage/framework/{sessions,views,cache} \
