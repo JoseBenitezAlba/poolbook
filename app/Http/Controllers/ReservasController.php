@@ -18,7 +18,7 @@ class ReservasController extends Controller
         // Verificar el rol del usuario
         if ($user && $user->hasRole(Role::ADMIN)) {
             // Si es un administrador, recuperar las reservas de todos los usuarios
-            $citas = cita::all();
+            $citas = Cita::with('user')->get();
             return view('admin.reservas', compact('citas'));
         } else {
             // Si no es un administrador, recuperar las reservas solo del usuario actual
