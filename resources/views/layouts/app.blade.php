@@ -9,33 +9,11 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
-
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
-    <!-- CSS Personalizado -->
-    <style>
-        .nav-link.btn-login {
-            background-color: #28a745; /* Verde para el botón Login */
-            color: #fff;
-        }
-
-        .nav-link.btn-login:hover {
-            background-color: #218838; /* Verde más oscuro al pasar el ratón por encima */
-        }
-
-        .nav-link.btn-register {
-            background-color: #ffc107; /* Amarillo para el botón Register */
-            color: #fff;
-        }
-
-        .nav-link.btn-register:hover {
-            background-color: #e0a800; /* Amarillo más oscuro al pasar el ratón por encima */
-        }
-    </style>
+    <!-- Sistema de diseño PoolBook (tipografía, colores, overrides de Bootstrap) -->
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
 </head>
 <body>
     <div id="app">
@@ -107,6 +85,11 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+        $(window).on('load', function() {
+    $('.btn-liquid').each(function() {
+        initButton($(this));
+    });
+});
     </script>
 </body>
 </html>

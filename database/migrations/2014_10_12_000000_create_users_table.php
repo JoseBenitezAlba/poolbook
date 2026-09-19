@@ -29,13 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Schema::dropIfExists('citas');
-
-        // Eliminar la columna y la clave foránea en la tabla citas si es necesario
-        // Schema::table('citas', function (Blueprint $table) {
-        //     $table->dropForeign(['user_id']);
-        //     $table->dropColumn('user_id');
-        // });
+    
 
         Schema::dropIfExists('users');
     }

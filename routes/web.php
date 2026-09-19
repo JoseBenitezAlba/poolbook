@@ -7,6 +7,7 @@ use App\Http\Controllers\ReservasController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CitaController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AsistenteController;
 
 
 /*
@@ -59,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/citas', [CitaController::class, 'store'])->name('citas.store');
     Route::delete('/citas/{cita}', [CitaController::class, 'destroy'])->name('citas.destroy');
     Route::get('/mis-reservas', [CitaController::class, 'reservasUsuario'])->name('citas.reservas');
+    Route::post('/asistente', [AsistenteController::class, 'chat'])->name('asistente.chat');
 });
 
 
@@ -101,6 +103,23 @@ Route::middleware('role:' . \App\Enums\Role::ADMIN)->group(function () {
     // Ruta para ver todos los usuarios
     Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.index');
 });
+
+Route::middleware('role:' . \App\Enums\Role::ADMIN)->group(function () {
+    // Detalle de un usuario: sus bonos y su historial de reservas
+    Route::get('/admin/users/{user}', [AdminUserController::class, 'show'])->name('admin.users.show');
+ 
+    // Añadir un bono nuevo a un usuario
+    Route::post('/admin/users/{user}/bonos', [AdminUserController::class, 'storeBono'])->name('admin.users.bonos.store');
+ 
+    // Desactivar / eliminar un bono
+    Route::patch('/admin/bonos/{bono}/desactivar', [AdminUserController::class, 'desactivarBono'])->name('admin.bonos.desactivar');
+    Route::delete('/admin/bonos/{bono}', [AdminUserController::class, 'destroyBono'])->name('admin.bonos.destroy');
+});
+  // Ruta para explicar el proyecto
+Route::get('/proyecto', function () {
+    return view('recruiter');
+})->name('recruiter');
+ 
 
 Route::middleware('role:' . \App\Enums\Role::ADMIN)->group(function () {
     Route::get('/admin/perfil', function () {

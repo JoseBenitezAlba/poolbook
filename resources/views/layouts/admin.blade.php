@@ -6,31 +6,38 @@
 
     <title>Panel Admin</title>
 
-    @vite(['resources/sass/app.scss', 'resources/js/app.js']) {{-- importa Tailwind / Bootstrap y tu app.css --}}
-    <link rel="stylesheet" href="{{ asset('menu-admin.css') }}"> {{-- tu CSS personalizado de menú admin --}}
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    <!-- Sistema de diseño PoolBook (el mismo que el resto del sitio) -->
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('menu-admin.css') }}">
 </head>
 <body>
-    <div class="container2">
-        <aside>
-            <p>Menu</p>
-            <a href="{{ route('calendario') }}">Calendario</a>
-            <a href="{{ route('reservas.index') }}">Reservas</a>
-            <a href="{{ route('admin.index') }}">Usuarios</a>
-            <a href="{{ route('admin.users.create') }}">Crear admin</a>
-            <a href="{{ route('admin.perfil') }}">Perfil</a>
-            <a href="{{ route('dashboard') }}">Dashboard</a>
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar__brand">PoolBook</div>
+            <nav class="admin-sidebar__nav">
+                <a href="{{ route('calendario') }}" class="{{ request()->routeIs('calendario') ? 'is-active' : '' }}">Calendario</a>
+                <a href="{{ route('reservas.index') }}" class="{{ request()->routeIs('reservas.index') ? 'is-active' : '' }}">Reservas</a>
+                <a href="{{ route('admin.index') }}" class="{{ request()->routeIs('admin.index') || request()->routeIs('admin.users.show') ? 'is-active' : '' }}">Usuarios</a>
+                <a href="{{ route('admin.users.create') }}" class="{{ request()->routeIs('admin.users.create') ? 'is-active' : '' }}">Crear Usuarios</a>
+                <a href="{{ route('admin.perfil') }}" class="{{ request()->routeIs('admin.perfil') ? 'is-active' : '' }}">Perfil</a>
+                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'is-active' : '' }}">Dashboard</a>
+            </nav>
             @auth
-            <a href="{{ route('logout') }}"
-               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-               Logout
-            </a>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
+                <div class="admin-sidebar__logout">
+                    <a href="{{ route('logout') }}"
+                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                       Cerrar sesión
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </div>
             @endauth
         </aside>
 
-        <div class="content">
+        <div class="admin-content">
             @yield('admin-content')
         </div>
     </div>

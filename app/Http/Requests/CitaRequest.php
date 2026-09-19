@@ -22,6 +22,11 @@ class CitaRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'start' => 'required|date_format:Y-m-d\TH:i:s.v\Z',
+            'end' => 'required|date|after:start',
+            'resourceId' => 'required|string',
+            'extendedProps.day_of_week' => 'required|integer',
+            'extendedProps.date' => 'required|date',
         ];
     }
 }

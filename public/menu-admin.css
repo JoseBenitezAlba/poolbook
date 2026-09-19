@@ -1,105 +1,109 @@
-/* Estilos para el aside */
-aside {
-    color: #fff;
-    width: 250px;
-    padding-left: 20px;
-    height: 100vh;
-    background-image: linear-gradient(30deg , #0048bd, #44a7fd);
-    border-top-right-radius: 80px;
-}
+/* ============================================================
+   PANEL ADMIN — SIDEBAR
+   Complementa a theme.css. Este archivo solo define la estructura
+   y el estilo del sidebar/contenido del panel de admin.
+   ============================================================ */
 
-aside a {
-    font-size: 12px;
-    color: #fff;
-    display: block;
-    padding: 12px;
-    padding-left: 30px;
-    text-decoration: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-aside a:hover {
-    color: #3f5efb;
-    background: #fff;
-    outline: none;
-    position: relative;
-    background-color: #fff;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
-}
-
-aside a i {
-    margin-right: 5px;
-}
-
-aside a:hover::after {
-    content: "";
-    position: absolute;
-    background-color: transparent;
-    bottom: 100%;
-    right: 0;
-    height: 35px;
-    width: 35px;
-    border-bottom-right-radius: 18px;
-    box-shadow: 0 20px 0 0 #fff;
-}
-
-aside a:hover::before {
-    content: "";
-    position: absolute;
-    background-color: transparent;
-    top: 38px;
-    right: 0;
-    height: 35px;
-    width: 35px;
-    border-top-right-radius: 18px;
-    box-shadow: 0 -20px 0 0 #fff;
-}
-
-aside p {
-    margin: 0;
-    padding: 40px 0;
-}
-
-/* Estilos para el contenido */
-.container2 {
+.admin-shell {
     display: flex;
+    min-height: 100vh;
 }
 
-.content {
-    flex: 1;
-    padding: 20px;
-}
-
-.metrics {
-    display: flex;
-    justify-content: space-around; /* Distribuir los elementos horizontalmente */
-    align-items: center; /* Centrar verticalmente */
-    margin-top: 20px; /* Espacio entre el dashboard y los cuadros */
-}
-
-.info-box {
-    width: 200px;
-    height: 200px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 20px;
-    box-sizing: border-box; /* Incluir padding en el tamaño total */
-    text-align: center;
+.admin-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background-color: var(--teal-900, #0B4F58);
+    color: #EAF5F5;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    padding: 1.75rem 1.25rem;
 }
 
-.info-box h3 {
-    margin-bottom: 10px;
+.admin-sidebar__brand {
+    font-family: var(--font-display, serif);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2rem;
+    letter-spacing: 0.01em;
 }
-.info-box p {
-    font-weight: bold;
-    font-size: 2.5rem;
-} 
 
-.info-box div {
-    font-size: 18px;
+.admin-sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+}
+
+.admin-sidebar__nav a {
+    color: #C9E4E4;
+    text-decoration: none;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    font-size: 0.95rem;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-sidebar__nav a:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+/* Resalta el enlace de la página actual. Blade no sabe cuál es "actual"
+   automáticamente: esto usa request()->routeIs() para marcarlo. */
+.admin-sidebar__nav a.is-active {
+    background-color: rgba(242, 112, 74, 0.15);
+    border-left-color: var(--coral, #F2704A);
+    color: #fff;
+    font-weight: 500;
+}
+
+.admin-sidebar__logout {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.admin-sidebar__logout a {
+    color: #C9E4E4;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.admin-sidebar__logout a:hover {
+    color: #fff;
+}
+
+.admin-content {
+    flex: 1;
+    padding: 2rem 2.5rem;
+    background-color: var(--paper, #F1F6F6);
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .admin-shell {
+        flex-direction: column;
+    }
+    .admin-sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 1rem;
+    }
+    .admin-sidebar__nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .admin-sidebar__logout {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 0;
+        margin-left: auto;
+    }
+    .admin-content {
+        padding: 1.5rem;
+    }
 }

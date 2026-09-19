@@ -1,0 +1,217 @@
+#calendar {
+    width: 100%;
+    height: 880px;
+    border:blue !important;
+  }
+  .fc-view-harness{
+      border:blue !important;
+  }
+
+  .carril-invisible .fc-datagrid-cell-main,
+  .carril-invisible .fc-datagrid-cell-content {
+    visibility: hidden;
+    color: white;
+  }
+
+  .fc-datagrid-cell-frame {
+    height: 180px;
+  }
+
+  .login-link, .register-link, .home-link {
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: var(--radius, 10px);
+    transition: background-color 0.3s;
+  }
+
+  .login-link:hover, .register-link:hover, .home-link:hover {
+    opacity: 0.9;
+  }
+
+  .login-link {
+    background-color: var(--teal-900, #0B4F58);
+    color: #fff;
+  }
+
+  .register-link {
+    background-color: var(--coral, #F2704A);
+    color: #fff;
+  }
+
+  .home-link {
+    background-color: var(--paper-deep, #E4EEEE);
+    color: var(--ink, #0E2B33);
+  }
+
+/* ============================================================
+   CHAT DEL ASISTENTE
+   ============================================================ */
+
+#asistente-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 20px 0 16px;
+  border-radius: 999px;
+  background: var(--teal-900, #0B4F58);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(14, 43, 51, 0.35);
+  z-index: 1000;
+  font-family: var(--font-body, sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  animation: asistente-pulso 2.2s ease-out 1s 3;
+}
+#asistente-btn svg {
+  color: var(--coral, #F2704A);
+  flex-shrink: 0;
+}
+#asistente-btn:hover {
+  background: var(--teal-700, #0F6470);
+  transform: scale(1.03);
+}
+
+/* Anillo que "late" un par de veces al cargar la página, para que
+   se note que el botón está ahí sin que sea una animación infinita
+   molesta. Se detiene sola (animation-iteration-count: 3). */
+@keyframes asistente-pulso {
+  0% { box-shadow: 0 4px 14px rgba(14, 43, 51, 0.35), 0 0 0 0 rgba(242, 112, 74, 0.55); }
+  70% { box-shadow: 0 4px 14px rgba(14, 43, 51, 0.35), 0 0 0 14px rgba(242, 112, 74, 0); }
+  100% { box-shadow: 0 4px 14px rgba(14, 43, 51, 0.35), 0 0 0 0 rgba(242, 112, 74, 0); }
+}
+
+/* Burbuja de aviso: aparece sola un momento después de cargar la
+   página y luego se desvanece. Puramente decorativa (aria-hidden),
+   no es clicable ni bloquea nada. */
+#asistente-aviso {
+  position: fixed;
+  bottom: 86px;
+  right: 24px;
+  max-width: 190px;
+  background: var(--ink, #0E2B33);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: var(--radius, 10px);
+  font-family: var(--font-body, sans-serif);
+  font-size: 13px;
+  line-height: 1.3;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  animation: asistente-aviso-fade 7s ease-in-out 1.2s 1;
+}
+#asistente-aviso::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 22px;
+  border-width: 6px 6px 0 6px;
+  border-style: solid;
+  border-color: var(--ink, #0E2B33) transparent transparent transparent;
+}
+@keyframes asistente-aviso-fade {
+  0%   { opacity: 0; transform: translateY(4px); }
+  12%  { opacity: 1; transform: translateY(0); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+#asistente-panel {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  width: 340px;
+  max-width: 90vw;
+  height: 460px;
+  background: #fff;
+  border: 1px solid var(--line, #D8E6E6);
+  border-radius: var(--radius, 12px);
+  box-shadow: 0 8px 30px rgba(14, 43, 51, 0.25);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+  font-family: var(--font-body, sans-serif);
+}
+#asistente-panel.open { display: flex; }
+
+#asistente-header {
+  background: var(--teal-900, #0B4F58);
+  color: #fff;
+  padding: 12px 14px;
+  font-family: var(--font-display, serif);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+#asistente-mensajes {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  font-size: 13px;
+  background: var(--paper, #F1F6F6);
+}
+
+.msg-usuario, .msg-ia {
+  max-width: 85%;
+  padding: 8px 10px;
+  border-radius: var(--radius, 10px);
+  margin-bottom: 8px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+.msg-usuario {
+  background: var(--teal-700, #0F6470);
+  color: #fff;
+  margin-left: auto;
+  border-bottom-right-radius: 2px;
+}
+.msg-ia {
+  background: var(--paper-deep, #E4EEEE);
+  color: var(--ink, #0E2B33);
+  margin-right: auto;
+  border-bottom-left-radius: 2px;
+}
+.msg-ia.pensando {
+  font-style: italic;
+  color: var(--ink-soft, #46626A);
+}
+
+#asistente-form {
+  display: flex;
+  border-top: 1px solid var(--line, #D8E6E6);
+}
+#asistente-input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  font-size: 13px;
+  outline: none;
+  font-family: var(--font-body, sans-serif);
+}
+#asistente-form button {
+  border: none;
+  background: var(--coral, #F2704A);
+  color: #fff;
+  padding: 0 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+}
+#asistente-form button:hover {
+  background: var(--coral-dark, #D9552F);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #asistente-btn, #asistente-aviso {
+    animation: none;
+  }
+}

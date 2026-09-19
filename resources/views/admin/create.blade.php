@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-8 offset-md-2">
                 <div class="card">
-                    <div class="card-header">Crear Usuario con Rol de Administrador</div>
+                    <div class="card-header">Crear usuario</div>
 
                     <div class="card-body">
                         <form method="POST" action="{{ route('admin.users.store') }}">
@@ -58,8 +58,12 @@
 
                                 <div class="col-md-6">
                                     <select id="role" class="form-control @error('role') is-invalid @enderror" name="role" required>
-                                        <option value="admin">Administrador</option>
-                                        <!-- Otras opciones de roles -->
+                                        <option value="{{ \App\Enums\Role::USUARIO }}" {{ old('role') === \App\Enums\Role::USUARIO ? 'selected' : '' }}>
+                                            Usuario normal
+                                        </option>
+                                        <option value="{{ \App\Enums\Role::ADMIN }}" {{ old('role') === \App\Enums\Role::ADMIN ? 'selected' : '' }}>
+                                            Administrador
+                                        </option>
                                     </select>
 
                                     @error('role')
@@ -73,7 +77,7 @@
                             <div class="form-group row mb-0">
                                 <div class="col-md-6 offset-md-4">
                                     <button type="submit" class="btn btn-primary">
-                                        {{ __('Crear Usuario') }}
+                                        {{ __('Crear usuario') }}
                                     </button>
                                 </div>
                             </div>

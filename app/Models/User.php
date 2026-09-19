@@ -51,4 +51,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Cita::class);
     }
+      public function bonos(): HasMany
+    {
+        return $this->hasMany(Bono::class);
+    }
 }

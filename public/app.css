@@ -16,12 +16,12 @@ body {
     color:#8dc8f0;
     font-size:36px;
     font-weight:bold;
-    top:38%;
+    top:34%;
     position:absolute;     
     margin:0 0 25px 0;
 }
 
-h2{
+.content h2{
     position:absolute;
 
     left:50%;
@@ -50,7 +50,7 @@ h2{
   position: relative;
   width: 450px;
   height: 50px;
-  border-radius: 50%;
+
   overflow: hidden;
   color: #fff;
   font-weight: bold;
@@ -327,7 +327,7 @@ hr {
         top: auto;
     }
 
-h2 {
+.content h2 {
     font-size: 12vmin;
     top: 5%;
 }

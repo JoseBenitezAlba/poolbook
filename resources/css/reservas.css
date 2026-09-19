@@ -1,0 +1,39 @@
+#reservas-realizadas {
+    margin-top: 0.5rem;
+}
+
+.reserva {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--line, #D8E6E6);
+    border-left: 4px solid var(--coral, #F2704A);
+    border-radius: var(--radius, 10px);
+    margin-bottom: 0.75rem;
+    background: #fff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.reserva:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(14, 43, 51, 0.12);
+}
+
+.reserva__info h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.reserva__info p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ink-soft, #46626A);
+}
+
+.reserva__vacio {
+    text-align: center;
+    color: var(--ink-soft, #46626A);
+    padding: 2rem 0;
+    margin: 0;
+}

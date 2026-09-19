@@ -1,39 +1,78 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    /* Estilo para el fondo de la página */
-    body {
-    background-image: url('/images/piscina.png'); /* Ruta a tu foto de fondo */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 100vh; /* Asegura que el fondo ocupe toda la altura de la pantalla */
-    margin: 0; /* Elimina el margen predeterminado del cuerpo */
-    padding: 0; /* Elimina el relleno predeterminado del cuerpo */
-}
+<link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
 
-</style>
-<div class="container-fluid">
+@php
+    $usuario = Auth::user();
+    $bonosActivos = $usuario->bonos()
+        ->where('activo', true)
+        ->where(function ($q) {
+            $q->whereNull('fecha_caducidad')
+                ->orWhereDate('fecha_caducidad', '>=', now()->toDateString());
+        })
+        ->get();
+    $iniciales = collect(explode(' ', $usuario->name))
+        ->map(fn ($palabra) => mb_strtoupper(mb_substr($palabra, 0, 1)))
+        ->take(2)
+        ->implode('');
+@endphp
+
+<div class="container-fluid perfil-wrap">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header text-center display-4">{{ __('Perfil de Usuario') }}</div>
-
-                <div class="card-body">
-                    <h5 class="display-5 mb-4">{{ __('Información Personal') }}</h5>
-                    <div class="mb-4 fs-5">
-                        <p><strong>{{ __('Nombre:') }}</strong> {{ Auth::user()->name }}</p>
-                        <p><strong>{{ __('Correo Electrónico:') }}</strong> {{ Auth::user()->email }}</p>
-                        <p><strong>{{ __('Teléfono:') }}</strong> {{ Auth::user()->phone ?? 'N/A' }}</p>
-                        <p><strong>{{ __('Fecha de creación de la cuenta:') }}</strong> {{ Auth::user()->created_at->format('d-m-Y') }}</p>
-                    </div>
-                    
-                    <div class="mt-5">
-                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-lg">{{ __('Atrás') }}</a>
-                        <a href="{{ route('home') }}" class="btn btn-primary btn-lg">{{ __('Inicio') }}</a>
+            <div class="card mb-4">
+                <div class="card-body perfil-header">
+                    <div class="perfil-avatar">{{ $iniciales }}</div>
+                    <div>
+                        <h4 class="mb-1">{{ $usuario->name }}</h4>
+                        <p class="text-muted mb-0">{{ __('Miembro desde') }} {{ $usuario->created_at->format('d/m/Y') }}</p>
                     </div>
                 </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">{{ __('Información personal') }}</div>
+                <div class="card-body">
+                    <div class="perfil-dato">
+                        <span class="perfil-dato__label">{{ __('Correo electrónico') }}</span>
+                        <span>{{ $usuario->email }}</span>
+                    </div>
+                    <div class="perfil-dato">
+                        <span class="perfil-dato__label">{{ __('Teléfono') }}</span>
+                        <span>{{ $usuario->phone ?? 'N/A' }}</span>
+                    </div>
+                    <div class="perfil-dato">
+                        <span class="perfil-dato__label">{{ __('Cuenta creada') }}</span>
+                        <span>{{ $usuario->created_at->format('d/m/Y') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-5">
+                <div class="card-header">{{ __('Tus bonos') }}</div>
+                <div class="card-body">
+                    @forelse ($bonosActivos as $bono)
+                        <div class="perfil-bono">
+                            <div>
+                                <strong>{{ $bono->sesiones_adquiridas - $bono->sesiones_gastadas }}</strong>
+                                {{ __('sesiones restantes de') }} {{ $bono->sesiones_adquiridas }}
+                            </div>
+                            <span class="text-muted">
+                                {{ $bono->fecha_caducidad
+                                    ? __('Caduca el') . ' ' . \Carbon\Carbon::parse($bono->fecha_caducidad)->format('d/m/Y')
+                                    : __('Sin caducidad') }}
+                            </span>
+                        </div>
+                    @empty
+                        <p class="text-muted mb-0">{{ __('No tienes ningún bono activo ahora mismo.') }}</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mb-5">
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">{{ __('Atrás') }}</a>
+                <a href="{{ route('home') }}" class="btn btn-primary">{{ __('Inicio') }}</a>
             </div>
         </div>
     </div>
