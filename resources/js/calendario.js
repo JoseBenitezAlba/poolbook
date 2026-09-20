@@ -70,6 +70,42 @@ function mapearEvento(event) {
     };
 }
 
+// ------------------------------------------------------------
+// MODO EDICIÓN: al pulsar "Editar" en una reserva propia, guardamos
+// aquí qué cita se está moviendo. Mientras esta variable no sea null,
+// el siguiente clic en el calendario (dateClick) no crea una reserva
+// nueva: mueve esta.
+// ------------------------------------------------------------
+let citaEnEdicion = null;
+
+function mostrarBannerEdicion() {
+    if (document.getElementById('edicion-banner')) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'edicion-banner';
+    banner.style.cssText = `
+        position: fixed; top: 0; left: 0; right: 0; z-index: 1200;
+        background: var(--teal-900, #0B4F58); color: #fff;
+        padding: 10px 16px; text-align: center; font-family: var(--font-body, sans-serif);
+        font-size: 14px;
+    `;
+    banner.innerHTML = `
+        Elige el nuevo hueco para tu reserva
+        <button id="edicion-cancelar" style="margin-left: 12px; background: var(--coral, #F2704A); color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px;">
+            Cancelar edición
+        </button>
+    `;
+    document.body.appendChild(banner);
+
+    document.getElementById('edicion-cancelar').addEventListener('click', ocultarBannerEdicion);
+}
+
+function ocultarBannerEdicion() {
+    citaEnEdicion = null;
+    const banner = document.getElementById('edicion-banner');
+    if (banner) banner.remove();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
 
@@ -208,6 +244,58 @@ document.addEventListener('DOMContentLoaded', function () {
                             timeZone: 'Europe/Madrid'
                         });
 
+                        // --- MODO EDICIÓN: moviendo una cita ya existente ---
+                        if (citaEnEdicion) {
+                            const citaId = citaEnEdicion;
+
+                            Swal.fire({
+                                title: 'Confirmar cambio',
+                                html: `¿Mover tu reserva al <b>${fechaFormateada}</b> a las <b>${horaFormateada}</b> en <b>${resourceTitle}</b>?`,
+                                showCancelButton: true,
+                                confirmButtonText: 'Sí, mover',
+                                cancelButtonText: 'Cancelar'
+                            }).then((confirmResult) => {
+                                if (!confirmResult.isConfirmed) return;
+
+                                const datosActualizados = {
+                                    start: startTime.toISOString(),
+                                    end: endTime.toISOString(),
+                                    resourceId: resourceId,
+                                    extendedProps: {
+                                        day_of_week: info.date.getUTCDay(),
+                                        date: info.date.toISOString().split('T')[0],
+                                    }
+                                };
+
+                                fetch(`/citas/${citaId}`, {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': window.csrfToken,
+                                    },
+                                    body: JSON.stringify(datosActualizados)
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            return response.json().then(error => {
+                                                throw new Error(error.error || 'Error desconocido');
+                                            });
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(() => {
+                                        ocultarBannerEdicion();
+                                        if (window.refrescarEventosCalendario) window.refrescarEventosCalendario();
+                                        Swal.fire('Movida', 'Tu reserva se ha actualizado.', 'success');
+                                    })
+                                    .catch((error) => {
+                                        Swal.fire('Error', error.message, 'error');
+                                    });
+                            });
+                            return;
+                        }
+
+                        // --- MODO NORMAL: crear una reserva nueva ---
                         Swal.fire({
                             title: 'Confirmar reserva',
                             html: `¿Quieres reservar el <b>${fechaFormateada}</b> a las <b>${horaFormateada}</b> en <b>${resourceTitle}</b>?`,
@@ -281,42 +369,70 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Si es admin viendo la reserva de otra persona, el título
                     // ya trae el nombre real (lo manda así el backend), así que
-                    // se ve claramente de quién es antes de cancelarla.
+                    // se ve claramente de quién es antes de cancelarla o moverla.
                     const nombreReserva = info.event.title;
 
                     Swal.fire({
-                        title: '¿Estás seguro de que deseas eliminar esta cita?',
-                        html: `Reserva de: <b>${nombreReserva}</b><br>Esta acción no se puede deshacer.`,
-                        icon: 'warning',
+                        title: nombreReserva,
+                        text: '¿Qué quieres hacer con esta reserva?',
+                        icon: 'question',
+                        showDenyButton: true,
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'No, cancelar'
+                        confirmButtonText: 'Editar',
+                        denyButtonText: 'Cancelar reserva',
+                        cancelButtonText: 'Cerrar'
                     }).then((result) => {
-                        if (!result.isConfirmed) return;
-
-                        fetch(`/citas/${info.event.id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': window.csrfToken,
-                            }
-                        })
-                            .then(response => {
-                                if (!response.ok) {
-                                    return response.json().then(error => {
-                                        throw new Error(error.message || error.error || 'Error desconocido');
-                                    });
-                                }
-                                return response.json();
-                            })
-                            .then(() => {
-                                info.event.remove();
-                                Swal.fire('Eliminado', 'La cita ha sido eliminada.', 'success');
-                            })
-                            .catch((error) => {
-                                Swal.fire('Error', error.message, 'error');
+                        if (result.isConfirmed) {
+                            // --- Entrar en modo edición ---
+                            citaEnEdicion = info.event.id;
+                            mostrarBannerEdicion();
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Modo edición activado',
+                                text: 'Haz clic en el nuevo día/hora/carril donde quieres mover esta reserva.',
+                                timer: 3000,
+                                showConfirmButton: false
                             });
+                            return;
+                        }
+
+                        if (!result.isDenied) return; // ni editar ni cancelar -> "Cerrar"
+
+                        // --- Cancelar la reserva (comportamiento de siempre) ---
+                        Swal.fire({
+                            title: '¿Estás seguro de que deseas eliminar esta cita?',
+                            html: `Reserva de: <b>${nombreReserva}</b><br>Esta acción no se puede deshacer.`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, eliminar',
+                            cancelButtonText: 'No, cancelar'
+                        }).then((confirmResult) => {
+                            if (!confirmResult.isConfirmed) return;
+
+                            fetch(`/citas/${info.event.id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': window.csrfToken,
+                                }
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        return response.json().then(error => {
+                                            throw new Error(error.message || error.error || 'Error desconocido');
+                                        });
+                                    }
+                                    return response.json();
+                                })
+                                .then(() => {
+                                    info.event.remove();
+                                    Swal.fire('Eliminado', 'La cita ha sido eliminada.', 'success');
+                                })
+                                .catch((error) => {
+                                    Swal.fire('Error', error.message, 'error');
+                                });
+                        });
                     });
                 }
             });

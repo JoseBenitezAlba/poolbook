@@ -51,8 +51,13 @@ class Cita extends Model
      * Devuelve null si es válida, o un string con el motivo si no lo es.
      * Único punto de verdad: lo usan CitaController, GeminiAssistantService
      * y ReservaRecurrenteService, para no repetir las reglas en 3 sitios.
+     *
+     * $excludeCitaId: al EDITAR una cita ya existente, hay que ignorarla a
+     * ella misma en las comprobaciones de "¿ya tienes reserva ese día?" y
+     * "¿hay hueco en ese carril y hora?" — si no, la cita chocaría consigo
+     * misma y no se podría guardar ni sin cambiar nada.
      */
-    public static function validarReserva(User $user, string $resourceId, Carbon $start, Carbon $end, string $fecha): ?string
+    public static function validarReserva(User $user, string $resourceId, Carbon $start, Carbon $end, string $fecha, ?int $excludeCitaId = null): ?string
     {
         if ($start->isBefore(Carbon::now())) {
             return 'No se pueden crear reservas para fechas u horas pasadas.';
@@ -72,6 +77,9 @@ class Cita extends Model
 
         $citasEseDia = self::where('user_id', $user->id)
             ->whereDate('date', $fecha)
+            ->when($excludeCitaId, function ($query) use ($excludeCitaId) {
+                $query->where('id', '!=', $excludeCitaId);
+            })
             ->count();
 
         if ($citasEseDia > 0 && ! $user->hasRole(Role::ADMIN)) {
@@ -79,6 +87,9 @@ class Cita extends Model
         }
 
         $existentesEnFranja = self::where('resource_id', $resourceId)
+            ->when($excludeCitaId, function ($query) use ($excludeCitaId) {
+                $query->where('id', '!=', $excludeCitaId);
+            })
             ->where(function ($query) use ($start, $end) {
                 $query->whereBetween('start', [$start, $end])
                     ->orWhereBetween('end', [$start, $end])

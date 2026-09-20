@@ -94,6 +94,55 @@ class CitaController extends Controller
             return response()->json(['error' => 'Error al almacenar la cita: ' . $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Update the specified resource (mover una reserva a otro día/hora/carril).
+     * No toca el bono: sigue siendo la misma sesión ya consumida, solo cambia
+     * cuándo y dónde es la cita.
+     */
+    public function update(CitaRequest $request, Cita $cita)
+    {
+        $response = Gate::inspect('update', $cita);
+
+        if (! $response->allowed()) {
+            return response()->json(['error' => 'No tienes permisos para modificar esta cita'], 403);
+        }
+
+        try {
+            $validatedData = $request->validated();
+            $user = $request->user();
+
+            $startDateTime = Carbon::parse(rtrim($validatedData['start'], 'Z'), 'Europe/Madrid');
+            $endDateTime = Carbon::parse(rtrim($validatedData['end'], 'Z'), 'Europe/Madrid');
+            $date = $validatedData['extendedProps']['date'];
+
+            // Le pasamos el id de la propia cita para que la validación no
+            // choque consigo misma (ver comentario en Cita::validarReserva).
+            $error = Cita::validarReserva($user, $validatedData['resourceId'], $startDateTime, $endDateTime, $date, $cita->id);
+
+            if ($error) {
+                return response()->json(['error' => $error], 409);
+            }
+
+            $cita->update([
+                'start' => $startDateTime->toDateTimeString(),
+                'end' => $endDateTime->toDateTimeString(),
+                'resource_id' => $validatedData['resourceId'],
+                'day_of_week' => $validatedData['extendedProps']['day_of_week'],
+                'date' => $date,
+            ]);
+
+            return response()->json(['id' => $cita->id], 200);
+
+        } catch (Exception $e) {
+            Log::error('Error al modificar la cita: ' . $e->getMessage(), [
+                'userId' => $request->user()->id,
+                'citaId' => $cita->id,
+                'request' => $request->all()
+            ]);
+            return response()->json(['error' => 'Error al modificar la cita: ' . $e->getMessage()], 500);
+        }
+    }
      
      
     /**

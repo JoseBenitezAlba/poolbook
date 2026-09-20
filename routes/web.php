@@ -121,6 +121,10 @@ Route::get('/proyecto', function () {
 })->name('recruiter');
  
 
+
+
+Route::patch('/citas/{cita}', [CitaController::class, 'update'])->name('citas.update');
+
 Route::middleware('role:' . \App\Enums\Role::ADMIN)->group(function () {
     Route::get('/admin/perfil', function () {
         return view('admin.perfil');

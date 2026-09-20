@@ -10,6 +10,18 @@ class CitaPolicy
 {
 
     /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, Cita $cita): bool
+    {
+        if ($user->hasRole(Role::ADMIN)) {
+            return true;
+        }
+
+        return $user->id == $cita->user_id;
+    }
+
+    /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, Cita $cita): bool
