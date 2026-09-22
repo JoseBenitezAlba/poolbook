@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Mis reservas · PoolBook')
+
 @section('content')
 <!-- Mismo fondo azul que el dashboard -->
 <link rel="stylesheet" href="{{ asset('menu.css') }}">

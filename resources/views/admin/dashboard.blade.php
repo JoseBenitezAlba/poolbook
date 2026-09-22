@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Dashboard · PoolBook Admin')
+
 @section('admin-content')
 <div class="container-fluid">
     <h1 class="h3 mb-4">Dashboard</h1>

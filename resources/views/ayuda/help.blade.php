@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Ayuda · PoolBook')
+@section('meta_description', 'Guías, material y estilos de natación, además de tutoriales para usar PoolBook.')
+
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/ayuda.css') }}">
 

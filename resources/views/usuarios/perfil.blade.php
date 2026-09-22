@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Mi perfil · PoolBook')
+
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
 

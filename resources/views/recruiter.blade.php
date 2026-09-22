@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PoolBook — Detalle técnico</title>
+    <meta name="description" content="Qué hay detrás de PoolBook: roles y permisos, lógica FIFO de bonos, un bug de timezone real corregido, y un asistente con function calling.">
     <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
     <style>
         body { background: var(--paper); }

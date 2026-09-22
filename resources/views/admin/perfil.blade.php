@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Mi perfil · PoolBook Admin')
+
 @section('admin-content')
 <div class="container-fluid">
     <h1 class="h3 mb-4">Perfil de administrador</h1>

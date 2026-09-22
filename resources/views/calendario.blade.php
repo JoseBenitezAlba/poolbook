@@ -4,6 +4,8 @@
 <head>
 
   <meta charset="utf-8" />
+  <title>Calendario · PoolBook</title>
+  <meta name="description" content="Consulta la disponibilidad de carriles y reserva tu hueco para nadar.">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -91,7 +93,7 @@
 <div id="asistente-panel">
   <div id="asistente-header">Asistente PoolBook</div>
   <div id="asistente-mensajes">
-    <div class="msg-ia">¡Hola! Puedo decirte qué carriles hay libres o reservarte uno. Por ejemplo: "resérvame el sábado a las 10, el carril que esté libre" o incluso reservas recurrentes como "resérvame todos los lunes hasta diciembre ".</div>
+    <div class="msg-ia">¡Hola! Puedo decirte qué carriles hay libres o reservarte uno. Por ejemplo: "resérvame el sábado a las 10, el carril que esté libre, a nombre de José".</div>
   </div>
   <form id="asistente-form">
     <input id="asistente-input" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />

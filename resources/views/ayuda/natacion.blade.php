@@ -11,6 +11,9 @@
 --}}
 @extends('layouts.app')
 
+@section('title', 'Estilos de natación · PoolBook')
+@section('meta_description', 'Crol, espalda, braza y mariposa: los cuatro estilos principales de la natación explicados.')
+
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/ayuda.css') }}">
 

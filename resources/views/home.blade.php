@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PoolBook</title>
+    <meta name="description" content="Reserva tu carril de piscina en segundos: elige día, hora y carril, confirma, y listo.">
     <link rel="stylesheet" href="{{ asset('app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -45,8 +46,8 @@
 
         .content {
             justify-content: flex-start !important;
-            padding-top: 34vh;
-            gap: 2.5rem;
+            padding-top: 35vh;
+            gap: 4.5rem;
         }
         .bienvenidos {
             position: static !important;

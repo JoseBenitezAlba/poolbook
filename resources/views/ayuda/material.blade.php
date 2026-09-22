@@ -7,6 +7,9 @@
 --}}
 @extends('layouts.app')
 
+@section('title', 'Material de natación · PoolBook')
+@section('meta_description', 'Equipo esencial para tus entrenamientos y competiciones: aletas, gafas, gorro, tabla, pull buoy y tubo de natación.')
+
 @section('content')
 {{-- Reutilizamos el mismo CSS que la página de ayuda principal --}}
 <link rel="stylesheet" href="{{ asset('css/ayuda.css') }}">

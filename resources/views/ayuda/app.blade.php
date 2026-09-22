@@ -7,6 +7,9 @@
 --}}
 @extends('layouts.app')
 
+@section('title', 'Tutoriales · PoolBook')
+@section('meta_description', 'Tutoriales en vídeo para aprender a usar PoolBook paso a paso: crear y cancelar citas, ver tus reservas.')
+
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/ayuda.css') }}">
 

@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Crear usuario · PoolBook Admin')
+
 @section('admin-content')
     <div class="container">
         <div class="row">

@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', $user->name . ' · PoolBook Admin')
+
 @section('admin-content')
 <div class="container-fluid">
 
