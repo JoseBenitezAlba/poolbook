@@ -508,16 +508,22 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify({ message: texto, history: historialGemini })
         })
-            .then(res => res.json())
+            .then(res => {
+                if (res.status === 429) {
+                    // Límite de peticiones alcanzado (throttle:12,1 en la ruta).
+                    throw new Error('Estás enviando mensajes muy rápido. Espera un momento e inténtalo de nuevo.');
+                }
+                return res.json();
+            })
             .then(data => {
                 pensando.remove();
                 agregarMensaje(data.reply || 'No he podido responder.', 'msg-ia');
                 historialGemini = data.history || historialGemini;
                 if (window.refrescarEventosCalendario) window.refrescarEventosCalendario();
             })
-            .catch(() => {
+            .catch((error) => {
                 pensando.remove();
-                agregarMensaje('Error de conexión con el asistente.', 'msg-ia');
+                agregarMensaje(error.message || 'Error de conexión con el asistente.', 'msg-ia');
             });
     });
 })();

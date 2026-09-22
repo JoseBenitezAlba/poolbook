@@ -60,7 +60,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/citas', [CitaController::class, 'store'])->name('citas.store');
     Route::delete('/citas/{cita}', [CitaController::class, 'destroy'])->name('citas.destroy');
     Route::get('/mis-reservas', [CitaController::class, 'reservasUsuario'])->name('citas.reservas');
-    Route::post('/asistente', [AsistenteController::class, 'chat'])->name('asistente.chat');
+   Route::post('/asistente', [AsistenteController::class, 'chat'])
+    ->middleware('throttle:12,1')
+    ->name('asistente.chat');
 });
 
 
