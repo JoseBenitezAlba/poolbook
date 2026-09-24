@@ -117,19 +117,36 @@ document.addEventListener('DOMContentLoaded', function () {
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
                 timeZone: 'Europe/Madrid',
+                locale: 'es',
                 initialView: 'resourceTimelineDay',
                 initialDate: getNextAvailableDay(),
                 aspectRatio: 1.5,
                 headerToolbar: {
                     left: 'prev,next',
                     center: 'title',
-                    right: 'buttonHome resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
+                    // Ya no hay botones de semana/mes: con solo carriles x horas
+                    // de un día, esas vistas no aportaban nada práctico (se veían
+                    // 30 días de huecos vacíos a la vez). En su lugar, un botón
+                    // que abre un selector de fecha nativo para saltar a
+                    // cualquier día directamente, como elegir sesión en un cine.
+                    right: 'buttonHome buttonElegirDia'
                 },
                 customButtons: {
                     buttonHome: {
-                        text: 'Home',
+                        text: 'Inicio',
                         click: function () {
                             window.location.href = '/home';
+                        }
+                    },
+                    buttonElegirDia: {
+                        text: 'Elegir día',
+                        click: function () {
+                            const input = document.getElementById('selector-fecha');
+                            if (input.showPicker) {
+                                input.showPicker();
+                            } else {
+                                input.focus();
+                            }
                         }
                     }
                 },
@@ -438,6 +455,18 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             calendar.render();
+
+            // Conecta el <input type="date"> oculto (ver calendario.blade.php)
+            // con el botón "Elegir día": al cambiar la fecha, el calendario
+            // salta directamente a ese día.
+            const selectorFecha = document.getElementById('selector-fecha');
+            if (selectorFecha) {
+                selectorFecha.addEventListener('change', function (e) {
+                    if (e.target.value) {
+                        calendar.gotoDate(e.target.value);
+                    }
+                });
+            }
 
             // Se exponen en window para que el chat del asistente pueda refrescar
             // el calendario tras crear una reserva por voz/texto.

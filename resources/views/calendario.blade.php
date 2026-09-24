@@ -7,6 +7,7 @@
   <title>Calendario · PoolBook</title>
   <meta name="description" content="Consulta la disponibilidad de carriles y reserva tu hueco para nadar.">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales-all.global.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -76,6 +77,8 @@
 <div class="flex flex-col items-center bg-gray-100 p-4">
   <!-- el calendario en si, esto lo pinta FullCalendar via js -->
   <div id="calendar" class="mx-auto"></div>
+  <!-- Oculto: lo abre el botón "Elegir día" del calendario (ver calendario.js) -->
+  <input type="date" id="selector-fecha" style="position:absolute; opacity:0; width:0; height:0; pointer-events:none;">
 </div>
 
 <!-- el chat solo sale si estas logueado, si no ni se pinta el html -->
@@ -93,7 +96,7 @@
 <div id="asistente-panel">
   <div id="asistente-header">Asistente PoolBook</div>
   <div id="asistente-mensajes">
-    <div class="msg-ia">¡Hola! Puedo decirte qué carriles hay libres o reservarte uno. Por ejemplo: "resérvame el sábado a las 10, el carril que esté libre, a nombre de José".</div>
+    <div class="msg-ia">¡Hola! Puedo decirte qué carriles hay libres o reservarte uno. Por ejemplo: "resérvame el sábado a las 10, el carril que esté libre, o reservame todos los lunes hasta tal dia.</div>
   </div>
   <form id="asistente-form">
     <input id="asistente-input" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />
