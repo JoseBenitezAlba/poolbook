@@ -7,7 +7,6 @@
     <meta name="description" content="Reserva tu carril de piscina en segundos: elige día, hora y carril, confirma, y listo.">
     <link rel="stylesheet" href="{{ asset('app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <style>
         html {
@@ -46,16 +45,87 @@
 
         .content {
             justify-content: flex-start !important;
-            padding-top: 35vh;
+            padding-top: 30vh;
             gap: 4.5rem;
         }
         .bienvenidos {
             position: static !important;
             top: auto !important;
-            margin: 0 !important;
+            margin: 0px !important;
+            padding-top: 60px !important;
         }
         .Home-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.25rem;
             margin-bottom: 3rem;
+        }
+
+        /* ------------------------------------------------------------
+           Botones "agua": CSS puro, sin JavaScript.
+           En reposo: píldora con borde azul claro. Al pasar el ratón
+           (o enfocar con teclado), una ola sube desde abajo, llena el
+           botón y se sigue desplazando de lado a lado.
+           ------------------------------------------------------------ */
+        .btn-agua {
+            position: relative;
+            isolation: isolate;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 320px;
+            max-width: 85vw;
+            height: 52px;
+            padding: 0 1.5rem;
+            border: 1.5px solid rgba(141, 200, 240, 0.7);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-family: var(--font-body, sans-serif);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            text-decoration: none;
+            overflow: hidden;
+            transition: color 0.35s ease, border-color 0.35s ease;
+        }
+        .btn-agua span {
+            position: relative;
+            z-index: 2;
+        }
+        .btn-agua::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 200%;
+            height: 130%;
+            z-index: 1;
+            /* La ola: un SVG con la cresta arriba y relleno hasta abajo.
+               Se repite en horizontal (cada tramo = ancho del botón) y su
+               posición se anima para que parezca que se mueve. */
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,30 C150,60 350,0 600,30 C850,60 1050,0 1200,30 L1200,120 L0,120 Z' fill='%238dc8f0'/%3E%3C/svg%3E") repeat-x 0 0 / 50% 100%;
+            transform: translateY(100%);
+            transition: transform 0.55s cubic-bezier(0.22, 0.8, 0.3, 1);
+            animation: agua-ola 3.5s linear infinite;
+        }
+        .btn-agua:hover::before,
+        .btn-agua:focus-visible::before {
+            transform: translateY(15%);
+        }
+        .btn-agua:hover,
+        .btn-agua:focus-visible {
+            color: #0f4c75;
+            border-color: #8dc8f0;
+        }
+        @keyframes agua-ola {
+            from { background-position-x: 0%; }
+            to   { background-position-x: 100%; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .btn-agua::before { animation: none; }
         }
         .recruiter-link {
             position: fixed;
@@ -132,6 +202,8 @@
             text-align: center;
             margin: 0;
         }
+
+        @media (max-width: 720px) {
             .como-funciona__pasos {
                 grid-template-columns: 1fr;
             }
@@ -149,21 +221,21 @@
 
             <div class="Home-buttons">
                 @guest
-                    <a href="{{ route('login') }}" class="btn-liquid">
-                        <span class="inner">Mi cuenta</span>
+                    <a href="{{ route('login') }}" class="btn-agua">
+                        <span>Mi cuenta</span>
                     </a>
                 @else
-                    <a href="{{ route('dashboard') }}" class="btn-liquid">
-                        <span class="inner">Mi cuenta</span>
+                    <a href="{{ route('dashboard') }}" class="btn-agua">
+                        <span>Mi cuenta</span>
                     </a>
                 @endguest
 
-                <a href="{{ route('calendario') }}" class="btn-liquid">
-                    <span class="inner">Reservar</span>
+                <a href="{{ route('calendario') }}" class="btn-agua">
+                    <span>Reservar</span>
                 </a>
 
-                <a href="#como-funciona" class="btn-liquid">
-                    <span class="inner">¿Cómo funciona?</span>
+                <a href="#como-funciona" class="btn-agua">
+                    <span>¿Cómo funciona?</span>
                 </a>
             </div>
         </div>
@@ -235,221 +307,8 @@
 
     <a href="{{ route('recruiter') }}" class="recruiter-link">¿Eres reclutador? Detalle técnico del proyecto →</a>
 
-    <script>
-    $(function() {
-        var viscosity = 50,
-            mouseDist = 30,
-            damping = 0.05,
-            points = 20;
-
-        $('.btn-liquid').each(function() {
-            initButton($(this));
-        });
-
-        function initButton($button) {
-            var pointsA = [],
-                pointsB = [],
-                $canvas = $('<canvas></canvas>'),
-                canvas = $canvas.get(0),
-                context = canvas.getContext('2d'),
-                mouseX = 0,
-                mouseY = 0,
-                relMouseX = 0,
-                relMouseY = 0,
-                mouseLastX = 0,
-                mouseLastY = 0,
-                mouseSpeedX = 0,
-                mouseSpeedY = 0;
-
-            $button.append($canvas);
-            var buttonWidth = $button.width(),
-                buttonHeight = $button.height();
-            canvas.width = buttonWidth + 100;
-            canvas.height = buttonHeight + 100;
-
-            $canvas.on('mousemove', function(e) {
-                var rect = canvas.getBoundingClientRect();
-                mouseX = e.clientX - rect.left;
-                mouseY = e.clientY - rect.top;
-
-                relMouseX = mouseX;
-                relMouseY = mouseY;
-
-                mouseSpeedX = mouseX - mouseLastX;
-                mouseSpeedY = mouseY - mouseLastY;
-
-                mouseLastX = mouseX;
-                mouseLastY = mouseY;
-            });
-
-            function addPoints(x, y) {
-                pointsA.push(new Point(x, y, 1));
-                pointsB.push(new Point(x, y, 2));
-            }
-
-            var x = buttonHeight;
-            addPoints(x + 100, 150);
-            for (var j = 1; j < points; j++) {
-                addPoints(x + ((buttonWidth - buttonHeight) / points) * j, 10);
-            }
-
-            function Point(x, y, level) {
-                this.x = this.ix = 50 + x;
-                this.y = this.iy = 50 + y;
-                this.vx = 10;
-                this.vy = 10;
-                this.level = level;
-            }
-
-            Point.prototype.move = function() {
-                var dx = this.ix - relMouseX,
-                    dy = this.iy - relMouseY;
-                var dist = Math.sqrt(dx * dx + dy * dy);
-                var relDist = (1 - dist / mouseDist);
-
-                this.vx += (this.ix - this.x) / (viscosity * this.level);
-                this.vy += (this.iy - this.y) / (viscosity * this.level);
-
-                if (relDist > 0 && relDist < 1) {
-                    this.vx += mouseSpeedX * relDist;
-                    this.vy += mouseSpeedY * relDist;
-                }
-                this.vx *= (1 - damping);
-                this.vy *= (1 - damping);
-                this.x += this.vx;
-                this.y += this.vy;
-            };
-
-            function renderCanvas() {
-                requestAnimationFrame(renderCanvas);
-                context.clearRect(0, 0, canvas.width, canvas.height);
-
-                context.fillStyle = '#fff';
-                context.beginPath();
-                context.moveTo(pointsA[0].x, pointsA[0].y);
-                for (var i = 1; i < pointsA.length; i++) {
-                    var p = pointsA[i];
-                    var prevP = pointsA[i - 1];
-                    var cx = (p.x + prevP.x) / 2;
-                    var cy = (p.y + prevP.y) / 2;
-                    context.quadraticCurveTo(prevP.x, prevP.y, cx, cy);
-                }
-                context.closePath();
-                context.fill();
-
-                for (var i = 0; i < pointsA.length; i++) {
-                    pointsA[i].move();
-                    pointsB[i].move();
-                }
-
-                var gradient = context.createRadialGradient(relMouseX, relMouseY, 0, relMouseX, relMouseY, canvas.width / 2);
-                gradient.addColorStop(0, 'rgba(185, 175, 233, 0.9)');
-                gradient.addColorStop(1, 'rgba(168, 213, 245, 0.9)');
-                context.fillStyle = gradient;
-                context.fill();
-            }
-
-            renderCanvas();
-        }
-    });
-    const canvas = document.getElementById("ocean");
-const ctx = canvas.getContext("2d");
-
-function resizeOcean(){
-    canvas.width = window.innerWidth;
-    canvas.height = canvas.offsetHeight;
-}
-
-resizeOcean();
-
-window.addEventListener("resize", resizeOcean);
-
-const waves = [
-{
-    color:"rgba(0,130,255,.18)",
-    amplitude:45,
-    wavelength:0.008,
-    speed:0.6,
-    offset:0
-},
-{
-    color:"rgba(0,150,255,.30)",
-    amplitude:35,
-    wavelength:0.011,
-    speed:0.9,
-    offset:35
-},
-{
-    color:"rgba(0,180,255,.45)",
-    amplitude:28,
-    wavelength:0.015,
-    speed:1.2,
-    offset:70
-},
-{
-    color:"#33b8ff",
-    amplitude:22,
-    wavelength:0.020,
-    speed:1.6,
-    offset:105
-}
-];
-
-let t=0;
-
-function draw(){
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    waves.forEach(w=>{
-
-        ctx.beginPath();
-
-        ctx.moveTo(0,canvas.height);
-
-        for(let x=0;x<=canvas.width;x++){
-
-            let y=
-
-                canvas.height*0.35
-
-                +
-
-                Math.sin(x*w.wavelength+t*w.speed)*w.amplitude
-
-                +
-
-                Math.sin(x*w.wavelength*2.3+t*w.speed*.7)*w.amplitude*.45
-
-                +
-
-                Math.sin(x*w.wavelength*.4+t*w.speed*.25)*w.amplitude*.8
-
-                +
-
-                w.offset;
-
-            ctx.lineTo(x,y);
-        }
-
-        ctx.lineTo(canvas.width,canvas.height);
-
-        ctx.closePath();
-
-        ctx.fillStyle=w.color;
-
-        ctx.fill();
-
-    });
-
-    t+=0.02;
-
-    requestAnimationFrame(draw);
-
-}
-
-draw();
-    </script>
+    {{-- Olas del fondo: mismo archivo compartido que usa el login y el registro --}}
+    <script src="{{ asset('js/ocean.js') }}"></script>
 
 </body>
 </html>
