@@ -4,16 +4,27 @@ namespace App\Services;
 use App\Models\Cita;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class GeminiAssistantService
 {
     private const MAX_MENSAJES_HISTORIAL = 12;
     private const MAX_TOKENS_RESPUESTA = 300;
     private const MAX_PASOS_HERRAMIENTAS = 4;
+
+    private const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
+
+    // Cuántas veces se vuelve a intentar una llamada a Groq que falla por un
+    // motivo pasajero (conexión, error 5xx, llamada a función mal formada).
+    private const REINTENTOS_GROQ = 2;
+    private const ESPERA_REINTENTO_MS = 600;
+    private const TIMEOUT_GROQ_SEGUNDOS = 20;
 
     protected array $carriles = ['carril1', 'carril2', 'carril3', 'carril4', 'carril5'];
 
@@ -256,23 +267,34 @@ TXT;
             'content' => $userMessage . $this->contextoFechaRecurrente($userMessage),
         ];
 
-        $endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+        // Si ya se ha ejecutado alguna herramienta en este turno (p. ej. se ha
+        // creado una reserva) y luego falla Groq, hay que conservar ese
+        // contexto para que el usuario no acabe duplicando la acción al reintentar.
+        $herramientasEjecutadas = false;
 
         for ($i = 0; $i < self::MAX_PASOS_HERRAMIENTAS; $i++) {
-            $response = Http::withToken($apiKey)
-                ->timeout(30)
-                ->post($endpoint, [
-                    'model' => $model,
-                    'messages' => $messages,
-                    'tools' => $this->tools,
-                    'tool_choice' => 'auto',
-                    'max_completion_tokens' => self::MAX_TOKENS_RESPUESTA,
-                    'reasoning_effort' => 'low',
-                ]);
+            $response = $this->llamarGroq($apiKey, [
+                'model' => $model,
+                'messages' => $messages,
+                'tools' => $this->tools,
+                'tool_choice' => 'auto',
+                'max_completion_tokens' => self::MAX_TOKENS_RESPUESTA,
+                'reasoning_effort' => 'low',
+            ]);
+
+            // Sin respuesta: no se pudo conectar con Groq ni tras los reintentos.
+            if ($response === null) {
+                return [
+                    'reply' => 'El servicio de IA no está disponible en este momento. Inténtalo de nuevo más tarde.',
+                    'history' => $herramientasEjecutadas ? $messages : $history,
+                ];
+            }
 
             if (! $response->successful()) {
-                Log::error('Error llamando a Groq', [
-                    'body' => $response->body(),
+                Log::error('Error llamando a Groq (sin más reintentos)', [
+                    'status' => $response->status(),
+                    'modelo' => $model,
+                    'body' => Str::limit($response->body(), 1500),
                 ]);
 
                 if ($response->status() === 429) {
@@ -283,13 +305,16 @@ TXT;
 
                     return [
                         'reply' => 'Se ha alcanzado temporalmente el límite gratuito del asistente.' . $detalleEspera,
-                        'history' => $messages,
+                        'history' => $herramientasEjecutadas ? $messages : $history,
                     ];
                 }
 
+                // Si el turno falla antes de ejecutar nada, se devuelve el
+                // historial original: así el mensaje que falló no queda
+                // duplicado cuando el usuario lo repite.
                 return [
                     'reply' => 'El servicio de IA no está disponible en este momento. Inténtalo de nuevo más tarde.',
-                    'history' => $messages,
+                    'history' => $herramientasEjecutadas ? $messages : $history,
                 ];
             }
 
@@ -306,6 +331,7 @@ TXT;
                     $argumentos = json_decode($toolCall['function']['arguments'] ?? '{}', true) ?? [];
 
                     $resultado = $this->ejecutarHerramienta($nombreHerramienta, $argumentos);
+                    $herramientasEjecutadas = true;
 
                     // En formato OpenAI/Groq, cada resultado de tool_call
                     // va como un mensaje role:"tool" con su tool_call_id.
@@ -329,6 +355,69 @@ TXT;
             'reply' => 'El asistente necesita una confirmación adicional antes de terminar. ¿Puedes repetir la última indicación?',
             'history' => $messages,
         ];
+    }
+
+    /**
+     * Llama a Groq y vuelve a intentarlo si el fallo es pasajero.
+     *
+     * Se reintenta cuando:
+     *  - no se puede conectar o se agota el tiempo de espera,
+     *  - Groq devuelve un error 5xx o 408,
+     *  - Groq devuelve 400 "tool_use_failed": el modelo generó mal la llamada
+     *    a una función. Es aleatorio, así que volver a pedirlo suele bastar.
+     *
+     * NO se reintenta un 429 (límite de peticiones): insistir solo lo empeora.
+     *
+     * Devuelve la última respuesta obtenida, o null si nunca hubo conexión.
+     * Cada intento fallido queda registrado en el log con el error real.
+     */
+    protected function llamarGroq(string $apiKey, array $payload): ?Response
+    {
+        $ultima = null;
+
+        for ($intento = 0; $intento <= self::REINTENTOS_GROQ; $intento++) {
+            if ($intento > 0) {
+                usleep(self::ESPERA_REINTENTO_MS * 1000 * $intento);
+            }
+
+            try {
+                $response = Http::withToken($apiKey)
+                    ->timeout(self::TIMEOUT_GROQ_SEGUNDOS)
+                    ->post(self::GROQ_ENDPOINT, $payload);
+            } catch (ConnectionException $e) {
+                Log::warning('Groq: fallo de conexión', [
+                    'intento' => $intento + 1,
+                    'error' => $e->getMessage(),
+                ]);
+                $ultima = null;
+                continue;
+            }
+
+            $ultima = $response;
+
+            if ($response->successful() || ! $this->esErrorReintentable($response)) {
+                return $response;
+            }
+
+            Log::warning('Groq: error pasajero, se reintenta', [
+                'intento' => $intento + 1,
+                'status' => $response->status(),
+                'body' => Str::limit($response->body(), 1500),
+            ]);
+        }
+
+        return $ultima;
+    }
+
+    protected function esErrorReintentable(Response $response): bool
+    {
+        $status = $response->status();
+
+        if ($status >= 500 || $status === 408) {
+            return true;
+        }
+
+        return $status === 400 && $response->json('error.code') === 'tool_use_failed';
     }
 
     /**
