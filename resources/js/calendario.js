@@ -114,6 +114,21 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             const events = data.map(mapearEvento);
 
+            // ------------------------------------------------------------
+            // AJUSTES PARA MÓVIL
+            // Se evalúan una sola vez al cargar (girar el móvil no los
+            // recalcula). Con slotMinWidth las columnas de hora no se
+            // aplastan: el timeline se hace más ancho que la pantalla y
+            // FullCalendar lo desplaza en horizontal por su cuenta.
+            // ------------------------------------------------------------
+            const esMovil = window.matchMedia('(max-width: 768px)').matches;
+            const ajustesMovil = esMovil ? {
+                slotMinWidth: 64,              // ancho mínimo de cada columna de hora (por defecto 30)
+                resourceAreaWidth: '84px',     // columna "Carril N" más estrecha
+                height: 'auto',                // altura según contenido, no según aspectRatio
+                titleFormat: { day: 'numeric', month: 'short' }, // "30 sept" en vez de la fecha larga
+            } : {};
+
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
                 timeZone: 'Europe/Madrid',
@@ -121,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 initialView: 'resourceTimelineDay',
                 initialDate: getNextAvailableDay(),
                 aspectRatio: 1.5,
+                ...ajustesMovil,
                 headerToolbar: {
                     left: 'prev,next',
                     center: 'title',
@@ -129,7 +145,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     // 30 días de huecos vacíos a la vez). En su lugar, un botón
                     // que abre un selector de fecha nativo para saltar a
                     // cualquier día directamente, como elegir sesión en un cine.
-                    right: 'buttonHome buttonElegirDia'
+                    // En móvil se quita "Inicio": ya está el enlace a PoolBook
+                    // en la cabecera de la página.
+                    right: esMovil ? 'buttonElegirDia' : 'buttonHome buttonElegirDia'
                 },
                 customButtons: {
                     buttonHome: {
@@ -196,156 +214,101 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     const startTime = roundTime(info.date, 60);
-                        const endTime = new Date(startTime.getTime() + 55 * 60 * 1000);
+                    const endTime = new Date(startTime.getTime() + 55 * 60 * 1000);
 
-                        // Comprobación final con la hora exacta que se enviará.
-                        // Impide reservar una franja de hoy que ya ha empezado.
-                        if (startTime <= new Date()) {
-                            Swal.fire('Hora no disponible', 'Esta hora ya ha pasado.', 'warning');
-                            return;
-                        }
+                    // Comprobación final con la hora exacta que se enviará.
+                    // Impide reservar una franja de hoy que ya ha empezado.
+                    if (startTime <= new Date()) {
+                        Swal.fire('Hora no disponible', 'Esta hora ya ha pasado.', 'warning');
+                        return;
+                    }
 
-                        // Validaciones rápidas en el frontend (solo para dar feedback
-                        // inmediato sin esperar al servidor; la validación real y
-                        // definitiva vive en el backend, en Cita::validarReserva).
-                        if (info.date.getDay() === 0) {
-                            Swal.fire('No se pueden programar citas los domingos.');
-                            return;
-                        }
+                    // Validaciones rápidas en el frontend (solo para dar feedback
+                    // inmediato sin esperar al servidor; la validación real y
+                    // definitiva vive en el backend, en Cita::validarReserva).
+                    if (info.date.getDay() === 0) {
+                        Swal.fire('No se pueden programar citas los domingos.');
+                        return;
+                    }
 
-                        const hour = startTime.getUTCHours();
+                    const hour = startTime.getUTCHours();
 
-                        if (info.date.getDay() === 6 && hour >= 14) {
-                            Swal.fire('No se pueden programar citas después de las 2 p.m. los sábados.');
-                            return;
-                        }
+                    if (info.date.getDay() === 6 && hour >= 14) {
+                        Swal.fire('No se pueden programar citas después de las 2 p.m. los sábados.');
+                        return;
+                    }
 
-                        if (hour < 9 || hour >= 22) {
-                            Swal.fire('No se pueden programar citas antes de las 9 a.m. o después de las 10 p.m.');
-                            return;
-                        }
+                    if (hour < 9 || hour >= 22) {
+                        Swal.fire('No se pueden programar citas antes de las 9 a.m. o después de las 10 p.m.');
+                        return;
+                    }
 
-                        const existingEvents = calendar.getEvents().filter(event => {
-                            return (
-                                event.resourceId !== 'carrilInvisible' &&
-                                event.start < endTime && event.end > startTime &&
-                                event.resourceId === resourceId
-                            );
-                        });
+                    const existingEvents = calendar.getEvents().filter(event => {
+                        return (
+                            event.resourceId !== 'carrilInvisible' &&
+                            event.start < endTime && event.end > startTime &&
+                            event.resourceId === resourceId
+                        );
+                    });
 
-                        const conflictingHourCounts = {};
-                        existingEvents.forEach(event => {
-                            const eventHour = new Date(event.start).getHours();
-                            conflictingHourCounts[eventHour] = (conflictingHourCounts[eventHour] || 0) + 1;
-                        });
+                    const conflictingHourCounts = {};
+                    existingEvents.forEach(event => {
+                        const eventHour = new Date(event.start).getHours();
+                        conflictingHourCounts[eventHour] = (conflictingHourCounts[eventHour] || 0) + 1;
+                    });
 
-                        if (conflictingHourCounts[hour] >= 2) {
-                            Swal.fire('Conflicto', 'Ya existen dos citas en ese horario y carril.', 'error');
-                            return;
-                        }
+                    if (conflictingHourCounts[hour] >= 2) {
+                        Swal.fire('Conflicto', 'Ya existen dos citas en ese horario y carril.', 'error');
+                        return;
+                    }
 
-                        // Banner de confirmación: evita crear una reserva por un
-                        // misclic, mostrando claramente fecha, hora y carril antes
-                        // de enviar nada al backend.
-                        const resourceTitle = info.resource.title || resourceId;
-                        const fechaFormateada = startTime.toLocaleDateString('es-ES', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            timeZone: 'Europe/Madrid'
-                        });
-                        const horaFormateada = startTime.toLocaleTimeString('es-ES', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            timeZone: 'Europe/Madrid'
-                        });
+                    // Banner de confirmación: evita crear una reserva por un
+                    // misclic, mostrando claramente fecha, hora y carril antes
+                    // de enviar nada al backend.
+                    const resourceTitle = info.resource.title || resourceId;
+                    const fechaFormateada = startTime.toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        timeZone: 'Europe/Madrid'
+                    });
+                    const horaFormateada = startTime.toLocaleTimeString('es-ES', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'Europe/Madrid'
+                    });
 
-                        // --- MODO EDICIÓN: moviendo una cita ya existente ---
-                        if (citaEnEdicion) {
-                            const citaId = citaEnEdicion;
+                    // --- MODO EDICIÓN: moviendo una cita ya existente ---
+                    if (citaEnEdicion) {
+                        const citaId = citaEnEdicion;
 
-                            Swal.fire({
-                                title: 'Confirmar cambio',
-                                html: `¿Mover tu reserva al <b>${fechaFormateada}</b> a las <b>${horaFormateada}</b> en <b>${resourceTitle}</b>?`,
-                                showCancelButton: true,
-                                confirmButtonText: 'Sí, mover',
-                                cancelButtonText: 'Cancelar'
-                            }).then((confirmResult) => {
-                                if (!confirmResult.isConfirmed) return;
-
-                                const datosActualizados = {
-                                    start: startTime.toISOString(),
-                                    end: endTime.toISOString(),
-                                    resourceId: resourceId,
-                                    extendedProps: {
-                                        day_of_week: info.date.getUTCDay(),
-                                        date: info.date.toISOString().split('T')[0],
-                                    }
-                                };
-
-                                fetch(`/citas/${citaId}`, {
-                                    method: 'PATCH',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': window.csrfToken,
-                                    },
-                                    body: JSON.stringify(datosActualizados)
-                                })
-                                    .then(response => {
-                                        if (!response.ok) {
-                                            return response.json().then(error => {
-                                                throw new Error(error.error || 'Error desconocido');
-                                            });
-                                        }
-                                        return response.json();
-                                    })
-                                    .then(() => {
-                                        ocultarBannerEdicion();
-                                        if (window.refrescarEventosCalendario) window.refrescarEventosCalendario();
-                                        Swal.fire('Movida', 'Tu reserva se ha actualizado.', 'success');
-                                    })
-                                    .catch((error) => {
-                                        Swal.fire('Error', error.message, 'error');
-                                    });
-                            });
-                            return;
-                        }
-
-                        // --- MODO NORMAL: crear una reserva nueva ---
                         Swal.fire({
-                            title: 'Confirmar reserva',
-                            html: `¿Quieres reservar el <b>${fechaFormateada}</b> a las <b>${horaFormateada}</b> en <b>${resourceTitle}</b>?`,
+                            title: 'Confirmar cambio',
+                            html: `¿Mover tu reserva al <b>${fechaFormateada}</b> a las <b>${horaFormateada}</b> en <b>${resourceTitle}</b>?`,
                             showCancelButton: true,
-                            confirmButtonText: 'Sí, reservar',
+                            confirmButtonText: 'Sí, mover',
                             cancelButtonText: 'Cancelar'
                         }).then((confirmResult) => {
                             if (!confirmResult.isConfirmed) return;
 
-                            const newEvent = {
-                                title: 'Mi reserva',
+                            const datosActualizados = {
                                 start: startTime.toISOString(),
                                 end: endTime.toISOString(),
                                 resourceId: resourceId,
-                                backgroundColor: 'var(--coral)',
-                                borderColor: 'var(--coral-dark)',
                                 extendedProps: {
                                     day_of_week: info.date.getUTCDay(),
                                     date: info.date.toISOString().split('T')[0],
-                                    esPropietaria: true,
-                                    puedeGestionar: true,
                                 }
                             };
 
-                            // La validación DEFINITIVA de todas estas reglas ocurre aquí,
-                            // en el backend (CitaController -> Cita::validarReserva).
-                            fetch('/citas', {
-                                method: 'POST',
+                            fetch(`/citas/${citaId}`, {
+                                method: 'PATCH',
                                 headers: {
                                     'Content-Type': 'application/json',
                                     'X-CSRF-TOKEN': window.csrfToken,
                                 },
-                                body: JSON.stringify(newEvent)
+                                body: JSON.stringify(datosActualizados)
                             })
                                 .then(response => {
                                     if (!response.ok) {
@@ -355,14 +318,69 @@ document.addEventListener('DOMContentLoaded', function () {
                                     }
                                     return response.json();
                                 })
-                                .then(data => {
-                                    newEvent.id = data.id;
-                                    calendar.addEvent(newEvent);
+                                .then(() => {
+                                    ocultarBannerEdicion();
+                                    if (window.refrescarEventosCalendario) window.refrescarEventosCalendario();
+                                    Swal.fire('Movida', 'Tu reserva se ha actualizado.', 'success');
                                 })
                                 .catch((error) => {
                                     Swal.fire('Error', error.message, 'error');
                                 });
                         });
+                        return;
+                    }
+
+                    // --- MODO NORMAL: crear una reserva nueva ---
+                    Swal.fire({
+                        title: 'Confirmar reserva',
+                        html: `¿Quieres reservar el <b>${fechaFormateada}</b> a las <b>${horaFormateada}</b> en <b>${resourceTitle}</b>?`,
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, reservar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((confirmResult) => {
+                        if (!confirmResult.isConfirmed) return;
+
+                        const newEvent = {
+                            title: 'Mi reserva',
+                            start: startTime.toISOString(),
+                            end: endTime.toISOString(),
+                            resourceId: resourceId,
+                            backgroundColor: 'var(--coral)',
+                            borderColor: 'var(--coral-dark)',
+                            extendedProps: {
+                                day_of_week: info.date.getUTCDay(),
+                                date: info.date.toISOString().split('T')[0],
+                                esPropietaria: true,
+                                puedeGestionar: true,
+                            }
+                        };
+
+                        // La validación DEFINITIVA de todas estas reglas ocurre aquí,
+                        // en el backend (CitaController -> Cita::validarReserva).
+                        fetch('/citas', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': window.csrfToken,
+                            },
+                            body: JSON.stringify(newEvent)
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.json().then(error => {
+                                        throw new Error(error.error || 'Error desconocido');
+                                    });
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                newEvent.id = data.id;
+                                calendar.addEvent(newEvent);
+                            })
+                            .catch((error) => {
+                                Swal.fire('Error', error.message, 'error');
+                            });
+                    });
                 },
 
                 // Clic en una cita ya existente -> ofrecer eliminarla

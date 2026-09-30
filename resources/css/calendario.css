@@ -215,3 +215,30 @@
     animation: none;
   }
 }
+
+/* ============================================================
+   RESPONSIVE (móvil)
+   Va al final a propósito: así gana a las reglas base de arriba
+   sin necesidad de !important.
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #calendar { height: auto; }
+
+  /* 180px por carril en móvil son 6 filas gigantes; con 96px caben
+     dos reservas apiladas en la misma hora */
+  .fc-datagrid-cell-frame { height: 96px; }
+  .fc-datagrid-cell-main { font-size: 0.85rem; }
+
+  .fc .fc-toolbar { flex-wrap: wrap; gap: 0.5rem; }
+  .fc .fc-toolbar-title { font-size: 1.1rem; }
+
+  #asistente-panel { right: 12px; bottom: 84px; }
+}
+
+/* Botón del asistente solo con icono en pantallas muy pequeñas */
+@media (max-width: 480px) {
+  #asistente-btn { right: 12px; bottom: 16px; padding: 0 16px; }
+  #asistente-btn span { display: none; }
+  #asistente-aviso { right: 12px; bottom: 76px; }
+}

@@ -208,6 +208,19 @@
                 grid-template-columns: 1fr;
             }
         }
+        @media (max-width: 768px) {
+    .content {
+        padding-top: 18vh;
+        gap: 1.5rem;
+    }
+    .bienvenidos {
+        padding-top: 0 !important;
+    }
+    .Home-buttons {
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+}
     </style>
 </head>
 <body>

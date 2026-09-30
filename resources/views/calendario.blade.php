@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="es">
 <head>
 
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calendario · PoolBook</title>
   <meta name="description" content="Consulta la disponibilidad de carriles y reserva tu hueco para nadar.">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
@@ -31,6 +32,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
       padding: 0.75rem 1.5rem;
       background-color: var(--paper);
       border-bottom: 1px solid var(--line);
@@ -45,6 +48,18 @@
     .poolbook-topbar__brand:hover {
       color: var(--coral);
     }
+    .poolbook-topbar__actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .poolbook-topbar {
+        padding: 0.6rem 1rem;
+      }
+    }
   </style>
 
 </head>
@@ -52,7 +67,7 @@
 
 <div class="poolbook-topbar">
   <a href="{{ url('/') }}" class="poolbook-topbar__brand">PoolBook</a>
-  <div class="flex items-center gap-4" style="display:flex; align-items:center; gap:1rem;">
+  <div class="poolbook-topbar__actions">
     {{-- Enlace al panel de admin, solo visible si el usuario logueado tiene el rol Admin --}}
     @auth
       @if (auth()->user()->hasRole(\App\Enums\Role::ADMIN))
