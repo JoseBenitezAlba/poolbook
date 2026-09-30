@@ -28,6 +28,11 @@
     letter-spacing: 0.01em;
 }
 
+/* El botón hamburguesa solo existe en móvil */
+.admin-sidebar__toggle {
+    display: none;
+}
+
 .admin-sidebar__nav {
     display: flex;
     flex-direction: column;
@@ -82,28 +87,94 @@
     min-width: 0;
 }
 
+/* ============================================================
+   MÓVIL
+   Barra fina arriba con "PoolBook" y un botón de hamburguesa.
+   Los enlaces y "Cerrar sesión" quedan ocultos hasta pulsarlo
+   (el JS de layouts/admin.blade.php añade la clase .is-open).
+   ============================================================ */
 @media (max-width: 768px) {
     .admin-shell {
         flex-direction: column;
     }
+
     .admin-sidebar {
         width: 100%;
-        flex-direction: row;
-        flex-wrap: wrap;
+        padding: 0.6rem 1rem;
+    }
+
+    .admin-sidebar__top {
+        display: flex;
         align-items: center;
-        padding: 1rem;
+        justify-content: space-between;
+        width: 100%;
     }
-    .admin-sidebar__nav {
-        flex-direction: row;
-        flex-wrap: wrap;
+
+    .admin-sidebar__brand {
+        margin-bottom: 0;
     }
+
+    .admin-sidebar__toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #fff;
+        cursor: pointer;
+    }
+    .admin-sidebar__toggle:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+    .admin-sidebar__toggle:focus-visible {
+        outline: 2px solid var(--coral, #F2704A);
+        outline-offset: 2px;
+    }
+
+    /* Icono: hamburguesa cerrado, X abierto */
+    .admin-sidebar__toggle .icon-cerrar { display: none; }
+    .admin-sidebar__toggle[aria-expanded="true"] .icon-abrir { display: none; }
+    .admin-sidebar__toggle[aria-expanded="true"] .icon-cerrar { display: block; }
+
+    /* Menú oculto hasta que se abre */
+    .admin-sidebar__nav,
     .admin-sidebar__logout {
-        margin-top: 0;
-        border-top: none;
-        padding-top: 0;
-        margin-left: auto;
+        display: none;
     }
+
+    .admin-sidebar.is-open .admin-sidebar__nav {
+        display: flex;
+        flex: none;
+        margin-top: 0.75rem;
+    }
+
+    .admin-sidebar.is-open .admin-sidebar__logout {
+        display: block;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* Enlaces cómodos de tocar con el dedo */
+    .admin-sidebar__nav a {
+        padding: 0.75rem;
+    }
+    .admin-sidebar__logout a {
+        display: inline-block;
+        padding: 0.5rem 0.75rem;
+    }
+
     .admin-content {
         padding: 1.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-sidebar__nav a {
+        transition: none;
     }
 }
