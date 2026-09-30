@@ -225,13 +225,30 @@
 @media (max-width: 768px) {
   #calendar { height: auto; }
 
-  /* 180px por carril en móvil son 6 filas gigantes; con 96px caben
-     dos reservas apiladas en la misma hora */
-  .fc-datagrid-cell-frame { height: 96px; }
-  .fc-datagrid-cell-main { font-size: 0.85rem; }
-
+  /* Barra superior */
   .fc .fc-toolbar { flex-wrap: wrap; gap: 0.5rem; }
-  .fc .fc-toolbar-title { font-size: 1.1rem; }
+  .fc .fc-toolbar-title { font-size: 1.05rem; text-transform: capitalize; }
+
+  /* Vista de columnas (resourceTimeGridDay): 5 carriles caben en ~390px.
+     La cabecera puede partir "Carril 1" en dos líneas. */
+  .fc .fc-col-header-cell-cushion {
+    font-size: 0.72rem;
+    padding: 6px 2px;
+    white-space: normal;
+    text-align: center;
+  }
+  .fc .fc-timegrid-axis-cushion,
+  .fc .fc-timegrid-slot-label-cushion {
+    font-size: 0.75rem;
+    padding: 0 4px;
+  }
+  /* Filas de 1 hora lo bastante altas para tocarlas con el dedo */
+  .fc .fc-timegrid-slot { height: 3.2rem; }
+  .fc .fc-timegrid-event .fc-event-main {
+    font-size: 0.68rem;
+    padding: 1px 2px;
+    line-height: 1.2;
+  }
 
   #asistente-panel { right: 12px; bottom: 84px; }
 }

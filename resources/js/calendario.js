@@ -115,25 +115,42 @@ document.addEventListener('DOMContentLoaded', function () {
             const events = data.map(mapearEvento);
 
             // ------------------------------------------------------------
-            // AJUSTES PARA MÓVIL
-            // Se evalúan una sola vez al cargar (girar el móvil no los
-            // recalcula). Con slotMinWidth las columnas de hora no se
-            // aplastan: el timeline se hace más ancho que la pantalla y
-            // FullCalendar lo desplaza en horizontal por su cuenta.
+            // VISTA PARA MÓVIL
+            // Se evalúa una sola vez al cargar (girar el móvil no la
+            // recalcula). En pantallas estrechas la timeline (carriles en
+            // filas, horas en columnas) obliga a desplazarse de lado y solo
+            // deja ver ~4 horas. Por eso en móvil usamos la vista
+            // transpuesta: horas en vertical y los 5 carriles como columnas.
             // ------------------------------------------------------------
             const esMovil = window.matchMedia('(max-width: 768px)').matches;
+
+            const carriles = [
+                { id: 'carril1', title: 'Carril 1' },
+                { id: 'carril2', title: 'Carril 2' },
+                { id: 'carril3', title: 'Carril 3' },
+                { id: 'carril4', title: 'Carril 4' },
+                { id: 'carril5', title: 'Carril 5' },
+            ];
+            // El carril "invisible" solo sirve para rellenar la timeline de
+            // escritorio; en la vista de columnas de móvil sobra.
+            const recursos = esMovil
+                ? carriles
+                : [...carriles, { id: 'carrilInvisible', title: ' ', className: 'carril-invisible' }];
+
             const ajustesMovil = esMovil ? {
-                slotMinWidth: 64,              // ancho mínimo de cada columna de hora (por defecto 30)
-                resourceAreaWidth: '84px',     // columna "Carril N" más estrecha
-                height: 'auto',                // altura según contenido, no según aspectRatio
-                titleFormat: { day: 'numeric', month: 'short' }, // "30 sept" en vez de la fecha larga
+                height: 'auto',               // altura según contenido, no según aspectRatio
+                allDaySlot: false,            // sin la fila "todo el día"
+                slotEventOverlap: false,      // dos reservas en la misma hora: una al lado de la otra
+                nowIndicator: true,           // línea con la hora actual
+                slotLabelFormat: { hour: 'numeric', minute: '2-digit', hour12: false }, // "9:00"
+                titleFormat: { weekday: 'short', day: 'numeric', month: 'short' },      // "mié, 30 sept"
             } : {};
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
                 timeZone: 'Europe/Madrid',
                 locale: 'es',
-                initialView: 'resourceTimelineDay',
+                initialView: esMovil ? 'resourceTimeGridDay' : 'resourceTimelineDay',
                 initialDate: getNextAvailableDay(),
                 aspectRatio: 1.5,
                 ...ajustesMovil,
@@ -171,8 +188,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 editable: false,
                 selectable: true,
                 resourceAreaHeaderContent: 'Carriles',
-                slotMinTime: '00:00:00',
-                slotMaxTime: '24:00:00',
+                // En móvil solo se muestra el horario real de la piscina
+                // (9 a 22), para no tener 24 filas casi vacías.
+                slotMinTime: esMovil ? '09:00:00' : '00:00:00',
+                slotMaxTime: esMovil ? '22:00:00' : '24:00:00',
                 slotDuration: '01:00:00',
                 dayMaxEvents: true,
                 // NOTA: estas franjas son solo visuales (sombrean el calendario).
@@ -182,14 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     { daysOfWeek: [1, 2, 3, 4, 5], startTime: '09:00', endTime: '22:00' },
                     { daysOfWeek: [6], startTime: '09:00', endTime: '14:00' }
                 ],
-                resources: [
-                    { id: 'carril1', title: 'Carril 1' },
-                    { id: 'carril2', title: 'Carril 2' },
-                    { id: 'carril3', title: 'Carril 3' },
-                    { id: 'carril4', title: 'Carril 4' },
-                    { id: 'carril5', title: 'Carril 5' },
-                    { id: 'carrilInvisible', title: ' ', className: 'carril-invisible' }
-                ],
+                resources: recursos,
                 events: events,
 
                 // Clic en una celda del calendario -> intentar crear una reserva
