@@ -208,19 +208,33 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ------------------------------------------------------------
+           Móvil: el hero de escritorio usa !important, así que esta
+           regla va al final a propósito para poder pisarlo.
+           ------------------------------------------------------------ */
         @media (max-width: 768px) {
-    .content {
-        padding-top: 18vh;
-        gap: 1.5rem;
-    }
-    .bienvenidos {
-        padding-top: 0 !important;
-    }
-    .Home-buttons {
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-}
+            .content {
+                padding-top: 18vh;
+                gap: 1.5rem;
+            }
+            .bienvenidos {
+                padding-top: 0 !important;
+            }
+            /* El subtítulo heredaba un tamaño enorme y quedaba pegado a
+               los bordes y alineado a la izquierda. */
+            .content .bienvenidos-sub {
+                font-size: 1.1rem !important;
+                line-height: 1.45 !important;
+                text-align: center !important;
+                padding: 0 1.75rem !important;
+                margin: 0 !important;
+            }
+            .Home-buttons {
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+        }
     </style>
 </head>
 <body>
