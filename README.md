@@ -106,7 +106,7 @@ Accede en: **http://localhost:8000**
 | Email | admin@poolbook.com |
 | Contraseña | admin1234 |
 
-> Creado automáticamente por el seeder. Cámbiala si lo usas en producción.
+> Creado automáticamente por el seeder. 
 
 ---
 
