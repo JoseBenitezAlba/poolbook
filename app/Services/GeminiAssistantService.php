@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 
 class GeminiAssistantService
 {
-    private const MAX_MENSAJES_HISTORIAL = 12;
+    private const MAX_MENSAJES_HISTORIAL = 8;
     private const MAX_TOKENS_RESPUESTA = 300;
     private const MAX_PASOS_HERRAMIENTAS = 4;
 
@@ -25,6 +25,14 @@ class GeminiAssistantService
     private const REINTENTOS_GROQ = 2;
     private const ESPERA_REINTENTO_MS = 600;
     private const TIMEOUT_GROQ_SEGUNDOS = 20;
+
+    // Si Groq responde 429 (límite por minuto) con una espera corta, esperamos
+    // nosotros y repetimos la llamada, para que el usuario no vea el error.
+    // Máximo por espera y máximo acumulado en un mismo mensaje del usuario.
+    private const MAX_ESPERA_429_SEGUNDOS = 10;
+    private const MAX_ESPERA_TOTAL_SEGUNDOS = 20;
+
+    protected float $esperaTotal429 = 0.0;
 
     protected array $carriles = ['carril1', 'carril2', 'carril3', 'carril4', 'carril5'];
 
@@ -227,6 +235,9 @@ class GeminiAssistantService
             ];
         }
 
+        // Cada mensaje del usuario empieza con el contador de esperas a cero
+        $this->esperaTotal429 = 0.0;
+
         $ahora = Carbon::now()->locale('es')->isoFormat('LLLL');
 
         $systemInstruction = <<<TXT
@@ -366,7 +377,9 @@ TXT;
      *  - Groq devuelve 400 "tool_use_failed": el modelo generó mal la llamada
      *    a una función. Es aleatorio, así que volver a pedirlo suele bastar.
      *
-     * NO se reintenta un 429 (límite de peticiones): insistir solo lo empeora.
+     * Un 429 (límite por minuto) solo se repite si Groq pide una espera corta
+     * (ver esperarSiEsCorto): se espera lo indicado y se vuelve a llamar. Si la
+     * espera es larga, se devuelve el 429 tal cual para avisar al usuario.
      *
      * Devuelve la última respuesta obtenida, o null si nunca hubo conexión.
      * Cada intento fallido queda registrado en el log con el error real.
@@ -395,7 +408,20 @@ TXT;
 
             $ultima = $response;
 
-            if ($response->successful() || ! $this->esErrorReintentable($response)) {
+            if ($response->successful()) {
+                $this->registrarUso($response, (string) ($payload['model'] ?? ''));
+
+                return $response;
+            }
+
+            // Límite por minuto (429) con una espera corta: esperamos aquí y
+            // repetimos. Esta espera no cuenta como reintento.
+            if ($response->status() === 429 && $this->esperarSiEsCorto($response)) {
+                $intento--;
+                continue;
+            }
+
+            if (! $this->esErrorReintentable($response)) {
                 return $response;
             }
 
@@ -421,13 +447,78 @@ TXT;
     }
 
     /**
-     * Mantiene un contexto corto sin separar una llamada de herramienta de su respuesta.
+     * Ante un 429, espera lo que pide Groq (cabecera retry-after) si es poco
+     * y devuelve true para que se repita la llamada. Si la espera es larga, o
+     * ya se ha esperado demasiado en este mensaje, devuelve false y el usuario
+     * verá el aviso de límite alcanzado.
+     */
+    protected function esperarSiEsCorto(Response $response): bool
+    {
+        $espera = (float) $response->header('retry-after');
+
+        if ($espera <= 0
+            || $espera > self::MAX_ESPERA_429_SEGUNDOS
+            || $this->esperaTotal429 + $espera > self::MAX_ESPERA_TOTAL_SEGUNDOS) {
+            return false;
+        }
+
+        $this->esperaTotal429 += $espera;
+
+        Log::info('Groq: límite por minuto, se espera y se reintenta', [
+            'espera_segundos' => $espera,
+        ]);
+
+        usleep((int) (($espera + 0.5) * 1_000_000));
+
+        return true;
+    }
+
+    /**
+     * Deja en el log cuántos tokens gasta cada llamada, para poder ver qué
+     * parte del límite por minuto consume el asistente.
+     */
+    protected function registrarUso(Response $response, string $modelo): void
+    {
+        $uso = $response->json('usage');
+
+        if (! is_array($uso)) {
+            return;
+        }
+
+        Log::info('Groq: tokens usados', [
+            'modelo' => $modelo,
+            'entrada' => $uso['prompt_tokens'] ?? null,
+            'salida' => $uso['completion_tokens'] ?? null,
+            'total' => $uso['total_tokens'] ?? null,
+        ]);
+    }
+
+    /**
+     * Mantiene un contexto corto y barato en tokens.
+     *
+     * Solo se conservan los mensajes del usuario y las respuestas finales en
+     * texto del asistente. Las llamadas a herramientas de turnos anteriores y
+     * sus resultados (JSON de disponibilidad, saldos...) se descartan: ya no
+     * hacen falta, el asistente las resumió en su respuesta, y eran lo que más
+     * tokens gastaba del límite por minuto. Además así nunca queda una llamada
+     * de herramienta separada de su resultado.
      */
     protected function recortarHistorial(array $history): array
     {
         $history = array_values(array_filter($history, function ($message) {
-            return is_array($message)
-                && in_array($message['role'] ?? null, ['user', 'assistant', 'tool'], true);
+            if (! is_array($message)) {
+                return false;
+            }
+
+            $rol = $message['role'] ?? null;
+
+            if ($rol === 'user') {
+                return true;
+            }
+
+            return $rol === 'assistant'
+                && empty($message['tool_calls'])
+                && trim((string) ($message['content'] ?? '')) !== '';
         }));
 
         $history = array_slice($history, -self::MAX_MENSAJES_HISTORIAL);
