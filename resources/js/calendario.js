@@ -45,6 +45,33 @@ function roundTime(date, minutes) {
 }
 
 /**
+ * Devuelve "ahora" en el mismo formato que usa el calendario.
+ *
+ * Con timeZone: 'Europe/Madrid', FullCalendar guarda la hora LOCAL de Madrid
+ * en los componentes UTC de cada fecha (info.date, event.start...). No son
+ * instantes reales. Por eso comparar esas fechas con new Date() (el instante
+ * real) se desfasa 1-2 horas. Esta función construye el "ahora" con la misma
+ * codificación, para poder compararlo directamente.
+ */
+function ahoraMadrid() {
+    const partes = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Madrid',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hourCycle: 'h23'
+    }).formatToParts(new Date());
+
+    const p = {};
+    partes.forEach(parte => { p[parte.type] = parte.value; });
+
+    return new Date(Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second));
+}
+
+/**
  * Convierte una cita tal como llega del backend (/citas) al formato
  * que espera FullCalendar. El backend ya decide, según el rol de quien
  * pregunta, si manda el nombre real (admin) o "Ocupado" (usuario normal),
@@ -218,7 +245,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     const resourceId = info.resource.id;
-                    const ahora = new Date();
+                    // "Ahora" con la misma codificación que info.date (ver ahoraMadrid)
+                    const ahora = ahoraMadrid();
 
                     if (info.date < ahora) {
                         Swal.fire('Hora no disponible', 'Esta hora ya ha pasado.', 'warning');
@@ -230,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Comprobación final con la hora exacta que se enviará.
                     // Impide reservar una franja de hoy que ya ha empezado.
-                    if (startTime <= new Date()) {
+                    if (startTime <= ahora) {
                         Swal.fire('Hora no disponible', 'Esta hora ya ha pasado.', 'warning');
                         return;
                     }
@@ -238,14 +266,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Validaciones rápidas en el frontend (solo para dar feedback
                     // inmediato sin esperar al servidor; la validación real y
                     // definitiva vive en el backend, en Cita::validarReserva).
-                    if (info.date.getDay() === 0) {
+                    if (info.date.getUTCDay() === 0) {
                         Swal.fire('No se pueden programar citas los domingos.');
                         return;
                     }
 
                     const hour = startTime.getUTCHours();
 
-                    if (info.date.getDay() === 6 && hour >= 14) {
+                    if (info.date.getUTCDay() === 6 && hour >= 14) {
                         Swal.fire('No se pueden programar citas después de las 2 p.m. los sábados.');
                         return;
                     }
@@ -255,21 +283,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         return;
                     }
 
-                    const existingEvents = calendar.getEvents().filter(event => {
-                        return (
-                            event.resourceId !== 'carrilInvisible' &&
-                            event.start < endTime && event.end > startTime &&
-                            event.resourceId === resourceId
-                        );
-                    });
+                    // Reservas que solapan con este hueco en este carril.
+                    // Un carril admite como máximo 2 a la vez.
+                    const ocupadas = calendar.getEvents().filter(event => {
+                        // Al mover una reserva propia, ella misma no cuenta como conflicto
+                        if (citaEnEdicion && String(event.id) === String(citaEnEdicion)) return false;
 
-                    const conflictingHourCounts = {};
-                    existingEvents.forEach(event => {
-                        const eventHour = new Date(event.start).getHours();
-                        conflictingHourCounts[eventHour] = (conflictingHourCounts[eventHour] || 0) + 1;
-                    });
+                        // El carril de un evento se consulta con getResources():
+                        // FullCalendar no expone una propiedad event.resourceId.
+                        const esDeEsteCarril = event.getResources().some(r => r.id === resourceId);
 
-                    if (conflictingHourCounts[hour] >= 2) {
+                        return esDeEsteCarril &&
+                            event.start < endTime &&
+                            (event.end || event.start) > startTime;
+                    }).length;
+
+                    if (ocupadas >= 2) {
                         Swal.fire('Conflicto', 'Ya existen dos citas en ese horario y carril.', 'error');
                         return;
                     }
