@@ -8,6 +8,8 @@
 
 Aplicación web para gestionar reservas de carriles de una piscina: calendario interactivo, panel de administración, roles y permisos, bonos de sesiones y un asistente de chat con IA que reserva por ti.
 
+> **En 30 segundos (para reclutadores):** proyecto full stack hecho con Laravel 10 y MySQL, desplegado y accesible en la demo. Lo más destacable: asistente con IA (Groq, function calling) que reserva en lenguaje natural usando las mismas reglas de negocio que el calendario, bonos con lógica FIFO y bloqueo de filas, y tests automatizados. Hay cuenta de prueba más abajo.
+
 ## 🌐 Demo y vídeo
 
 - 🔗 **Demo online:** https://poolbook.onrender.com/
@@ -174,6 +176,7 @@ La demo está desplegada en **Render** con base de datos MySQL en la nube. Algun
 - API REST para gestión de reservas
 - Mensajes de validación en español en todos los formularios
 - Rediseño de la vista de reservas del panel de administración
+- Actualizar de Laravel 10 a una versión con soporte de seguridad (en una rama, con los tests como red de seguridad)
 
 ## 📚 Qué he aprendido con este proyecto
 
