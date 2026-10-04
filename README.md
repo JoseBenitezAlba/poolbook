@@ -118,7 +118,7 @@ Un usuario puede modificar o cancelar sus propias reservas, mientras que un admi
 | IA | Groq API · Function Calling |
 | Tests | PHPUnit |
 
-Para el calendario se utiliza también Tailwind mediante CDN y la interfaz utiliza las fuentes **Fraunces** e **IBM Plex Sans**.
+
 
 ---
 
