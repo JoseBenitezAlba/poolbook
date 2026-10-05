@@ -306,18 +306,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Banner de confirmación: evita crear una reserva por un
                     // misclic, mostrando claramente fecha, hora y carril antes
                     // de enviar nada al backend.
+                    //
+                    // OJO: startTime lleva la hora de Madrid codificada en sus
+                    // componentes UTC (no es un instante real). Por eso se formatea
+                    // con timeZone: 'UTC'. Con 'Europe/Madrid' se le sumarían 1-2 h
+                    // y el diálogo diría 22:00 al pulsar las 20:00.
                     const resourceTitle = info.resource.title || resourceId;
                     const fechaFormateada = startTime.toLocaleDateString('es-ES', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
-                        timeZone: 'Europe/Madrid'
+                        timeZone: 'UTC'
                     });
                     const horaFormateada = startTime.toLocaleTimeString('es-ES', {
                         hour: '2-digit',
                         minute: '2-digit',
-                        timeZone: 'Europe/Madrid'
+                        timeZone: 'UTC'
                     });
 
                     // --- MODO EDICIÓN: moviendo una cita ya existente ---

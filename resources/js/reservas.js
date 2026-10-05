@@ -12,6 +12,30 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // "Ahora" en Madrid con el mismo formato en que la base de datos guarda las
+    // reservas ("YYYY-MM-DD HH:MM:SS", hora local de Madrid): así se comparan
+    // texto con texto, sin líos de zonas horarias del navegador.
+    function ahoraMadridTexto() {
+        const p = {};
+        new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Europe/Madrid',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hourCycle: 'h23'
+        }).formatToParts(new Date()).forEach(function (parte) { p[parte.type] = parte.value; });
+
+        return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
+    }
+
+    function yaHaEmpezado(reserva) {
+        const inicio = String(reserva.start).replace('T', ' ').slice(0, 19);
+        return inicio <= ahoraMadridTexto();
+    }
+
     function nombreCarril(resourceId) {
         // resourceId llega como "carril3"; lo convertimos en "Carril 3"
         // en vez del redundante "Carril carril3".
@@ -30,14 +54,21 @@ document.addEventListener('DOMContentLoaded', function () {
         reservas.forEach(function (reserva) {
             const div = document.createElement('div');
             div.className = 'reserva';
+
+            // Las reservas que ya han empezado no se pueden cancelar (el servidor
+            // tampoco lo permite): en su lugar se muestra una etiqueta.
+            const accion = yaHaEmpezado(reserva)
+                ? '<span class="badge bg-secondary">Pasada</span>'
+                : `<button type="button" class="btn btn-outline-danger btn-sm" data-id="${reserva.id}">
+                        Cancelar
+                    </button>`;
+
             div.innerHTML = `
                 <div class="reserva__info">
                     <h3>${nombreCarril(reserva.resource_id)}</h3>
                     <p>${formatoFechaHora(reserva.start)} &rarr; ${formatoFechaHora(reserva.end)}</p>
                 </div>
-                <button type="button" class="btn btn-outline-danger btn-sm" data-id="${reserva.id}">
-                    Cancelar
-                </button>
+                ${accion}
             `;
             contenedor.appendChild(div);
         });

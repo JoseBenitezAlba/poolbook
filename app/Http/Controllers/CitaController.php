@@ -212,6 +212,21 @@ public function destroy(Request $request, Cita $cita, BonoService $bonoService)
         }
     }
 
+    // Una reserva que ya ha empezado no se puede cancelar: devolvería al bono
+    // una sesión de una clase ya utilizada. Los administradores sí pueden
+    // gestionarlas. La hora de la cita se guarda como hora local de Madrid.
+    $yaEmpezada = Carbon::parse($cita->start, 'Europe/Madrid')->isBefore(Carbon::now('Europe/Madrid'));
+
+    if ($yaEmpezada && ! $request->user()->hasRole(Role::ADMIN)) {
+        $mensaje = 'No se puede cancelar una reserva que ya ha empezado.';
+
+        if ($request->expectsJson()) {
+            return response()->json(['error' => $mensaje], 422);
+        }
+
+        return redirect()->back()->with('error', $mensaje);
+    }
+
     DB::transaction(function () use ($cita, $bonoService) {
         if ($cita->bono) {
             $bonoService->devolverSesion($cita->bono);

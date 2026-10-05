@@ -165,8 +165,8 @@
                 <span>admin@poolbook.com / admin1234</span>
             </div>
             <div class="cuenta">
-                <span><strong>Usuario</strong> — bono con sesiones prácticamente ilimitadas, para probar el
-                    calendario y el asistente de chat sin límite</span>
+                <span><strong>Usuario</strong> — bono con 99 sesiones, de sobra para probar el
+                    calendario y el asistente de chat</span>
                 <span>prueba@prueba.com / prueba</span>
             </div>
         </div>
@@ -176,7 +176,7 @@
         <h2>Stack técnico</h2>
         <p>
             Laravel 10 · <code>spatie/laravel-permission</code> · FullCalendar (Scheduler) · SweetAlert2 para
-            confirmaciones · Google Gemini con function calling para el asistente · Vite · Bootstrap con un
+            confirmaciones · Groq (modelo gpt-oss) con function calling para el asistente · Vite · Bootstrap con un
             sistema de diseño propio por encima (tipografía, color y componentes reestilizados).
         </p>
     </div>
