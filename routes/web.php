@@ -44,20 +44,24 @@ Route::get('/home', function () {
 //Ruta del perfil de usuario, si no esta Logueado se le pedira que se loguee
 Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
-//Dentro del perfil tenemos la ruta para ver el perfil, que contiene informacion basica, de cuando se creo la cuenta y datos, y luego otra vista de sus reservas
-Route::get('/perfil', function () {
-    return view('usuarios.perfil');
-})->name('perfil');
-Route::get('/reservas', [ReservasController::class, 'index'])->name('reservas.index');
 
 // Esta ruta solo va a tener permiso para acceder el administrador (Es una prueba)
 Route::middleware('role:' . \App\Enums\Role::ADMIN)->get('/pagos-administrador', function () {
     return 123;
 })->name('pagos-administrador');
 
-// Ruta para la creacion y eliminacion de citas
+// Rutas que requieren sesión iniciada: si el visitante no ha hecho login,
+// Laravel lo redirige al formulario de login en vez de dar un error 500.
 Route::middleware('auth')->group(function () {
+    // Perfil del usuario (datos básicos y bonos) y la vista de sus reservas
+    Route::get('/perfil', function () {
+        return view('usuarios.perfil');
+    })->name('perfil');
+    Route::get('/reservas', [ReservasController::class, 'index'])->name('reservas.index');
+
+    // Creación, modificación y eliminación de citas
     Route::post('/citas', [CitaController::class, 'store'])->name('citas.store');
+    Route::patch('/citas/{cita}', [CitaController::class, 'update'])->name('citas.update');
     Route::delete('/citas/{cita}', [CitaController::class, 'destroy'])->name('citas.destroy');
     Route::get('/mis-reservas', [CitaController::class, 'reservasUsuario'])->name('citas.reservas');
    Route::post('/asistente', [AsistenteController::class, 'chat'])
@@ -125,7 +129,6 @@ Route::get('/proyecto', function () {
 
 
 
-Route::patch('/citas/{cita}', [CitaController::class, 'update'])->name('citas.update');
 
 Route::middleware('role:' . \App\Enums\Role::ADMIN)->group(function () {
     Route::get('/admin/perfil', function () {
