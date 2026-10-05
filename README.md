@@ -4,6 +4,12 @@ Aplicación web para la gestión y reserva de carriles de una piscina.
 
 Es mi proyecto final de **Desarrollo de Aplicaciones Web (DAW)** y está desarrollado con **Laravel, MySQL y JavaScript**. La idea era hacer algo más que un simple calendario de reservas: usuarios, bonos de sesiones, administración, permisos y un asistente con IA capaz de consultar disponibilidad y realizar reservas.
 
+## Capturas
+
+![Calendario de reservas en escritorio](docs/screenshots/calendario-escritorio.png)
+
+<img src="docs/screenshots/calendario-movil.png" alt="Calendario de reservas en móvil" width="260">
+
 ## 🌐 Demo
 
 **Aplicación:** https://poolbook.onrender.com/
