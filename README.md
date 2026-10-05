@@ -6,7 +6,17 @@ Es mi proyecto final de **Desarrollo de Aplicaciones Web (DAW)** y está desarro
 
 ## Capturas
 
-![PoolBook walkthrough](docs/screenshots/1-poolbook-walkthrough.mp4)
+**Vista de usuario**
+
+![PoolBook: vista de usuario](docs/screenshots/4-user.gif)
+
+**Reservas**
+
+![PoolBook: reservas](docs/screenshots/5-reservas.gif)
+
+**Administración**
+
+![PoolBook: administración](docs/screenshots/6-admin.gif)
 
 ## 🌐 Demo
 
