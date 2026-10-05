@@ -6,9 +6,7 @@ Es mi proyecto final de **Desarrollo de Aplicaciones Web (DAW)** y está desarro
 
 ## Capturas
 
-![Calendario de reservas en escritorio](docs/screenshots/calendario-escritorio.png)
-
-<img src="docs/screenshots/calendario-movil.png" alt="Calendario de reservas en móvil" width="260">
+![PoolBook walkthrough](docs/screenshots/1-poolbook-walkthrough.mp4)
 
 ## 🌐 Demo
 
