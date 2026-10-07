@@ -21,9 +21,9 @@ return [
         'scheme' => 'https',
     ],
     'groq' => [
-    'key' => env('GROQ_API_KEY'),
-    'model' => env('GROQ_MODEL', 'openai/gpt-oss-20b'),
-],
+        'key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'openai/gpt-oss-20b'),
+    ],
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
@@ -33,11 +33,6 @@ return [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-    ],
-
-    'gemini' => [
-        'key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
     ],
 
 ];

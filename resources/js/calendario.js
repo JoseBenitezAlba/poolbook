@@ -1,7 +1,7 @@
 // ============================================================
 // CALENDARIO DE RESERVAS - PoolBook
 // Usa FullCalendar (vista de recursos/carriles) + SweetAlert2
-// para las confirmaciones, y un chat de asistente con IA (Gemini).
+// para las confirmaciones, y un chat de asistente con IA.
 // ============================================================
 
 /**
@@ -548,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ============================================================
-// CHAT DEL ASISTENTE (Gemini)
+// CHAT DEL ASISTENTE
 // Este bloque de HTML solo se renderiza si el usuario está logueado
 // (@auth en calendario.blade.php), así que si no lo está, los elementos
 // #asistente-btn, #asistente-panel, etc. no existen en la página.
@@ -564,7 +564,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    let historialGemini = [];
+    let historialAsistente = [];
     const panel = document.getElementById('asistente-panel');
     const mensajesEl = document.getElementById('asistente-mensajes');
     const form = document.getElementById('asistente-form');
@@ -599,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': window.csrfToken,
             },
-            body: JSON.stringify({ message: texto, history: historialGemini })
+            body: JSON.stringify({ message: texto, history: historialAsistente })
         })
             .then(res => {
                 if (res.status === 429) {
@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 pensando.remove();
                 agregarMensaje(data.reply || 'No he podido responder.', 'msg-ia');
-                historialGemini = data.history || historialGemini;
+                historialAsistente = data.history || historialAsistente;
                 if (window.refrescarEventosCalendario) window.refrescarEventosCalendario();
             })
             .catch((error) => {

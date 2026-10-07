@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class GeminiAssistantService
+class AsistenteService
 {
     private const MAX_MENSAJES_HISTORIAL = 8;
     private const MAX_TOKENS_RESPUESTA = 300;
