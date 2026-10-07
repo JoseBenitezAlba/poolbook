@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Reserva; // Asegúrate de importar el modelo Reserva
 use App\Enums\Role;
 use App\Models\Cita;
 
