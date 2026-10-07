@@ -17,32 +17,6 @@
     height: 180px;
   }
 
-  .login-link, .register-link, .home-link {
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: var(--radius, 10px);
-    transition: background-color 0.3s;
-  }
-
-  .login-link:hover, .register-link:hover, .home-link:hover {
-    opacity: 0.9;
-  }
-
-  .login-link {
-    background-color: var(--teal-900, #0B4F58);
-    color: #fff;
-  }
-
-  .register-link {
-    background-color: var(--coral, #F2704A);
-    color: #fff;
-  }
-
-  .home-link {
-    background-color: var(--paper-deep, #E4EEEE);
-    color: var(--ink, #0E2B33);
-  }
-
 /* ============================================================
    CHAT DEL ASISTENTE
    ============================================================ */
