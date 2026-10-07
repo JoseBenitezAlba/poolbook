@@ -24,18 +24,6 @@ use Illuminate\Support\Facades\DB;
 class CitaController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $citas = Cita::all();
-       
-
-        return response()->json($citas);
-    }
-
-
-    /**
      * Store a newly created resource in storage.
      */
 
