@@ -25,7 +25,7 @@ Route::get('/', function () {
     return view('home');
 });
 
-Auth::routes();
+Auth::routes(['reset' => false]);
 
 
 // La ruta del calendario
@@ -44,11 +44,6 @@ Route::get('/home', function () {
 //Ruta del perfil de usuario, si no esta Logueado se le pedira que se loguee
 Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
-
-// Esta ruta solo va a tener permiso para acceder el administrador (Es una prueba)
-Route::middleware('role:' . \App\Enums\Role::ADMIN)->get('/pagos-administrador', function () {
-    return 123;
-})->name('pagos-administrador');
 
 // Rutas que requieren sesión iniciada: si el visitante no ha hecho login,
 // Laravel lo redirige al formulario de login en vez de dar un error 500.
