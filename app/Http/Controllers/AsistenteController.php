@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\GeminiAssistantService;
+use App\Services\AsistenteService;
 use Illuminate\Http\Request;
 
 class AsistenteController extends Controller
 {
-    public function chat(Request $request, GeminiAssistantService $asistente)
+    public function chat(Request $request, AsistenteService $asistente)
     {
         $validated = $request->validate([
             'message' => 'required|string|max:500',

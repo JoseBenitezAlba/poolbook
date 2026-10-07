@@ -49,7 +49,7 @@ class Cita extends Model
     /**
      * Comprueba todas las reglas de negocio para una reserva.
      * Devuelve null si es válida, o un string con el motivo si no lo es.
-     * Único punto de verdad: lo usan CitaController, GeminiAssistantService
+     * Único punto de verdad: lo usan CitaController, AsistenteService
      * y ReservaRecurrenteService, para no repetir las reglas en 3 sitios.
      *
      * $excludeCitaId: al EDITAR una cita ya existente, hay que ignorarla a
