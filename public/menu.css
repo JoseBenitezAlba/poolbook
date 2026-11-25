@@ -1,0 +1,12 @@
+body {
+    background:#0f4c75;
+    background-attachment: fixed;
+    color: #fff;
+}
+
+
+.content {
+    position: relative;
+    z-index: 10;
+}
+

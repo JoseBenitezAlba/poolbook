@@ -1,0 +1,180 @@
+/* ============================================================
+   PANEL ADMIN — SIDEBAR
+   Complementa a theme.css. Este archivo solo define la estructura
+   y el estilo del sidebar/contenido del panel de admin.
+   ============================================================ */
+
+.admin-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background-color: var(--teal-900, #0B4F58);
+    color: #EAF5F5;
+    display: flex;
+    flex-direction: column;
+    padding: 1.75rem 1.25rem;
+}
+
+.admin-sidebar__brand {
+    font-family: var(--font-display, serif);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2rem;
+    letter-spacing: 0.01em;
+}
+
+/* El botón hamburguesa solo existe en móvil */
+.admin-sidebar__toggle {
+    display: none;
+}
+
+.admin-sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+}
+
+.admin-sidebar__nav a {
+    color: #C9E4E4;
+    text-decoration: none;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    font-size: 0.95rem;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-sidebar__nav a:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+/* Resalta el enlace de la página actual. Blade no sabe cuál es "actual"
+   automáticamente: esto usa request()->routeIs() para marcarlo. */
+.admin-sidebar__nav a.is-active {
+    background-color: rgba(242, 112, 74, 0.15);
+    border-left-color: var(--coral, #F2704A);
+    color: #fff;
+    font-weight: 500;
+}
+
+.admin-sidebar__logout {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.admin-sidebar__logout a {
+    color: #C9E4E4;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.admin-sidebar__logout a:hover {
+    color: #fff;
+}
+
+.admin-content {
+    flex: 1;
+    padding: 2rem 2.5rem;
+    background-color: var(--paper, #F1F6F6);
+    min-width: 0;
+}
+
+/* ============================================================
+   MÓVIL
+   Barra fina arriba con "PoolBook" y un botón de hamburguesa.
+   Los enlaces y "Cerrar sesión" quedan ocultos hasta pulsarlo
+   (el JS de layouts/admin.blade.php añade la clase .is-open).
+   ============================================================ */
+@media (max-width: 768px) {
+    .admin-shell {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        padding: 0.6rem 1rem;
+    }
+
+    .admin-sidebar__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .admin-sidebar__brand {
+        margin-bottom: 0;
+    }
+
+    .admin-sidebar__toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #fff;
+        cursor: pointer;
+    }
+    .admin-sidebar__toggle:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+    .admin-sidebar__toggle:focus-visible {
+        outline: 2px solid var(--coral, #F2704A);
+        outline-offset: 2px;
+    }
+
+    /* Icono: hamburguesa cerrado, X abierto */
+    .admin-sidebar__toggle .icon-cerrar { display: none; }
+    .admin-sidebar__toggle[aria-expanded="true"] .icon-abrir { display: none; }
+    .admin-sidebar__toggle[aria-expanded="true"] .icon-cerrar { display: block; }
+
+    /* Menú oculto hasta que se abre */
+    .admin-sidebar__nav,
+    .admin-sidebar__logout {
+        display: none;
+    }
+
+    .admin-sidebar.is-open .admin-sidebar__nav {
+        display: flex;
+        flex: none;
+        margin-top: 0.75rem;
+    }
+
+    .admin-sidebar.is-open .admin-sidebar__logout {
+        display: block;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* Enlaces cómodos de tocar con el dedo */
+    .admin-sidebar__nav a {
+        padding: 0.75rem;
+    }
+    .admin-sidebar__logout a {
+        display: inline-block;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .admin-content {
+        padding: 1.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-sidebar__nav a {
+        transition: none;
+    }
+}
