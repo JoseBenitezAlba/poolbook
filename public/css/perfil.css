@@ -1,0 +1,64 @@
+/* Fondo de foto de piscina, igual que tenías, pero ahora en su propio
+   archivo en vez de un <style> inline dentro del Blade. */
+body {
+    background-image:
+        linear-gradient(180deg, rgba(11, 79, 88, 0.55), rgba(11, 79, 88, 0.4)),
+        url('/images/piscina.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.perfil-wrap {
+    padding-top: 3rem;
+    padding-bottom: 2rem;
+}
+
+.perfil-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.perfil-avatar {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--teal-900, #0B4F58);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display, serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.perfil-dato {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    font-size: 0.95rem;
+}
+.perfil-dato + .perfil-dato {
+    border-top: 1px solid var(--line, #D8E6E6);
+}
+.perfil-dato__label {
+    color: var(--ink-soft, #46626A);
+}
+
+.perfil-bono {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.6rem 0;
+    font-size: 0.95rem;
+}
+.perfil-bono + .perfil-bono {
+    border-top: 1px solid var(--line, #D8E6E6);
+}

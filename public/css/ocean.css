@@ -1,0 +1,12 @@
+/* Canvas de olas animadas, reutilizable en cualquier página que cargue
+   public/js/ocean.js. Va detrás del contenido (z-index negativo) y no
+   captura clics, así que no molesta a formularios ni botones encima. */
+#ocean {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 45vh;
+    z-index: -1;
+    pointer-events: none;
+}

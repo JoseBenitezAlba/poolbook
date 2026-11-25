@@ -1,0 +1,308 @@
+/* ============================================================
+   POOLBOOK — SISTEMA DE DISEÑO
+   Se carga en TODAS las páginas (públicas y admin) por encima de
+   Bootstrap. No sustituye a Bootstrap: reestiliza sus componentes
+   (.btn, .card, .table, .navbar, .badge, .alert...) para que todo
+   el sitio comparta la misma identidad visual sin reescribir cada
+   plantilla Blade una por una.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --paper: #F1F6F6;
+    --paper-deep: #E4EEEE;
+    --ink: #0E2B33;
+    --ink-soft: #46626A;
+    --teal-900: #0B4F58;
+    --teal-700: #0F6470;
+    --teal-500: #1C8598;
+    --coral: #F2704A;
+    --coral-dark: #D9552F;
+    --line: #D8E6E6;
+    --success: #3F8F5F;
+    --danger: #C1483B;
+    --warning: #C98A2C;
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    --radius: 10px;
+}
+
+/* ---------- Base ---------- */
+
+body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background-color: var(--paper);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--font-display);
+    color: var(--ink);
+    font-weight: 600;
+}
+
+a {
+    color: var(--teal-500);
+}
+a:hover {
+    color: var(--coral);
+}
+
+:focus-visible {
+    outline: 2px solid var(--coral);
+    outline-offset: 2px;
+}
+
+/* ---------- Navbar (layouts/app.blade.php) ---------- */
+
+.navbar {
+    background-color: var(--paper) !important;
+    border-bottom: 1px solid var(--line);
+    box-shadow: none !important;
+}
+
+.navbar-brand {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--ink) !important;
+    letter-spacing: 0.01em;
+}
+
+.nav-link.btn-login {
+    background-color: var(--teal-900) !important;
+    color: var(--paper) !important;
+    border-radius: var(--radius);
+    padding: 0.4rem 0.9rem;
+}
+.nav-link.btn-login:hover {
+    background-color: var(--teal-700) !important;
+}
+
+.nav-link.btn-register {
+    background-color: var(--coral) !important;
+    color: #fff !important;
+    border-radius: var(--radius);
+    padding: 0.4rem 0.9rem;
+}
+.nav-link.btn-register:hover {
+    background-color: var(--coral-dark) !important;
+}
+
+/* ---------- Botones ----------
+   Definidos de forma autosuficiente: no dependen de que Bootstrap
+   esté cargado (el calendario, por ejemplo, no lo carga). */
+
+.btn {
+    display: inline-block;
+    padding: 0.45rem 1rem;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn:hover {
+    text-decoration: none;
+}
+.btn-sm {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+.btn-danger:hover, .btn-danger:focus {
+    background-color: #A53C30;
+    border-color: #A53C30;
+    color: #fff;
+}
+
+.btn-primary {
+    background-color: var(--teal-900);
+    border-color: var(--teal-900);
+    color: #fff;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--teal-700);
+    border-color: var(--teal-700);
+    color: #fff;
+}
+
+.btn-outline-primary {
+    color: var(--teal-900);
+    border-color: var(--teal-900);
+}
+.btn-outline-primary:hover {
+    background-color: var(--teal-900);
+    border-color: var(--teal-900);
+    color: #fff;
+}
+
+.btn-outline-secondary {
+    color: var(--ink-soft);
+    border-color: var(--line);
+}
+.btn-outline-secondary:hover {
+    background-color: var(--ink-soft);
+    border-color: var(--ink-soft);
+    color: #fff;
+}
+
+.btn-outline-warning {
+    color: var(--warning);
+    border-color: var(--warning);
+}
+.btn-outline-warning:hover {
+    background-color: var(--warning);
+    border-color: var(--warning);
+    color: #fff;
+}
+
+.btn-outline-danger {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+.btn-outline-danger:hover {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+/* Botón "principal" de reserva/confirmación en toda la app: coral */
+.btn-cta {
+    background-color: var(--coral);
+    border-color: var(--coral);
+    color: #fff;
+}
+.btn-cta:hover {
+    background-color: var(--coral-dark);
+    border-color: var(--coral-dark);
+    color: #fff;
+}
+
+/* ---------- Tarjetas ---------- */
+
+.card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: none;
+}
+
+.card-header {
+    background-color: var(--paper-deep);
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--ink);
+}
+
+/* ---------- Tablas ---------- */
+
+.table thead,
+.table thead.bg-primary {
+    background-color: var(--teal-900) !important;
+}
+.table thead th {
+    background-color: var(--teal-900) !important;
+    color: var(--paper) !important;
+    font-weight: 500;
+    border-bottom: none;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--paper-deep);
+}
+
+/* ---------- Badges / estados ---------- */
+
+.badge.bg-success { background-color: var(--success) !important; }
+.badge.bg-danger  { background-color: var(--danger) !important; }
+.badge.bg-warning { background-color: var(--warning) !important; color: #fff !important; }
+.badge.bg-secondary { background-color: var(--ink-soft) !important; }
+
+/* ---------- Alertas ---------- */
+
+.alert-success {
+    background-color: #E4F3E9;
+    border-color: var(--success);
+    color: #235C3B;
+}
+.alert-danger {
+    background-color: #FBEAE7;
+    border-color: var(--danger);
+    color: #7A2C22;
+}
+
+/* ---------- Divisor "corchera de carril" ----------
+   Motivo estructural reutilizable: una línea fina que separa
+   secciones, inspirada en las corcheras que dividen los carriles
+   de la piscina
+*/
+.lane-divider {
+    height: 1px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--teal-500) 0 12px,
+        transparent 12px 20px
+    );
+    opacity: 0.5;
+    margin: 2.5rem 0;
+}
+
+/* ---------- Tarjetas de métrica (dashboards) ---------- */
+
+.metrics-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.metric-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
+}
+.metric-card .metric-value {
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    font-weight: 600;
+    color: var(--teal-900);
+    line-height: 1;
+}
+.metric-card .metric-label {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin-top: 0.6rem;
+}
+
+/* ---------- SweetAlert2 (calendario) ---------- */
+
+.swal2-popup {
+    font-family: var(--font-body) !important;
+    border-radius: var(--radius) !important;
+}
+.swal2-title {
+    font-family: var(--font-display) !important;
+    color: var(--ink) !important;
+}
+.swal2-confirm {
+    background-color: var(--coral) !important;
+}
+.swal2-cancel {
+    background-color: var(--ink-soft) !important;
+}
